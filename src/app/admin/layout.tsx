@@ -38,6 +38,11 @@ export default function AdminLayout({
       icon: Home,
     },
     {
+      href: '/admin/orders',
+      label: 'Orders',
+      icon: ShoppingCart,
+    },
+    {
       href: '/admin/products',
       label: 'Products',
       icon: Package,
@@ -46,11 +51,6 @@ export default function AdminLayout({
       href: '/admin/categories',
       label: 'Categories',
       icon: Tag,
-    },
-    {
-      href: '/admin/orders',
-      label: 'Orders',
-      icon: ShoppingCart,
     },
     {
       href: '/admin/customers',

@@ -33,27 +33,3 @@ export type Order = {
   status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Canceled';
   date: string;
 };
-
-export type SubCategory = {
-  id: string;
-  name: string;
-  href: string;
-};
-
-export type Category = {
-  id: string;
-  name: string;
-  href: string;
-  subcategories: SubCategory[];
-  image: string;
-  imageHint: string;
-};
-
-export type Review = {
-  id: string;
-  name: string;
-  avatar: string;
-  rating: number;
-  title: string;
-  comment: string;
-};

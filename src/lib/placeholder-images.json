@@ -47,54 +47,6 @@
       "description": "A pair of colorful running shoes.",
       "imageUrl": "https://images.unsplash.com/photo-1469395446868-fb6a048d5ca3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxydW5uaW5nJTIwc2hvZXN8ZW58MHx8fHwxNzYxOTc5MTQ4fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "running shoes"
-    },
-    {
-      "id": "hero-slide-1",
-      "description": "A person wearing stylish headphones.",
-      "imageUrl": "https://images.unsplash.com/photo-1647346811373-a2ca54f0c21b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8aGVhZHBob25lcyUyMG1vZGVsfGVufDB8fHx8MTc2MjAyMzIxOHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "headphones model"
-    },
-    {
-      "id": "hero-slide-2",
-      "description": "A modern watch on a display stand.",
-      "imageUrl": "https://images.unsplash.com/photo-1676315636794-04c032cff6a9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHx3YXRjaCUyMGRpc3BsYXl8ZW58MHx8fHwxNzYyMDIzMjE4fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "watch display"
-    },
-    {
-      "id": "hero-slide-3",
-      "description": "Someone enjoying coffee from a coffee maker.",
-      "imageUrl": "https://images.unsplash.com/photo-1595475038699-283c9aa41e09?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBjb2ZmZWV8ZW58MHx8fHwxNzYxOTQwOTM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "person coffee"
-    },
-    {
-      "id": "hero-slide-4",
-      "description": "A smart speaker in a modern living room setting.",
-      "imageUrl": "https://images.unsplash.com/photo-1533777857984-535d4c39386c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzbWFydCUyMHNwZWFrZXIlMjBsaWZlc3R5bGV8ZW58MHx8fHwxNzYyMzkxOTIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "smart speaker"
-    },
-    {
-      "id": "hero-slide-5",
-      "description": "A person's feet in running shoes, mid-stride.",
-      "imageUrl": "https://images.unsplash.com/photo-1542280756-31016674ac77?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxydW5uaW5nJTIwc2hvZXMlMjBhY3Rpb258ZW58MHx8fHwxNzYyMzkxOTYxfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "running shoes"
-    },
-    {
-      "id": "category-electronics",
-      "description": "A collection of various electronic gadgets.",
-      "imageUrl": "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxlbGVjdHJvbmljcyUyMGdhZGdldHN8ZW58MHx8fHwxNzYyMTU0ODkxfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "electronic gadgets"
-    },
-    {
-      "id": "category-fashion",
-      "description": "Stylish clothing and accessories on display.",
-      "imageUrl": "https://images.unsplash.com/photo-1445205170230-053b83016050?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwY2xvdGhpbmd8ZW58MHx8fHwxNzYyMTU0OTU1fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "fashion clothing"
-    },
-    {
-      "id": "category-home",
-      "description": "A cozy and modern living room.",
-      "imageUrl": "https://images.unsplash.com/photo-1618220179428-22790b461013?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjb3p5JTIwbGl2aW5nJTIwcm9vbXxlbnwwfHx8fDE3NjIxNTUwMDh8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "living room"
     }
   ]
 }

@@ -10,9 +10,9 @@ export default function RootLayoutClient({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAdminPage = pathname.startsWith('/admin');
+  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup');
 
-  if (isAdminPage) {
+  if (isAuthPage) {
     return <>{children}</>;
   }
 

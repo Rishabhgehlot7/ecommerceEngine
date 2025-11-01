@@ -13,12 +13,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import Link from 'next/link';
-import { User, LogOut, ShoppingBasket } from 'lucide-react';
+import { User, LogOut, ShoppingBasket, Home } from 'lucide-react';
+import { Skeleton } from "../ui/skeleton";
 
 export function UserNav() {
-  const { isAuthenticated, logout } = useAuth();
+  const { user, isUserLoading, logout } = useAuth();
 
-  if (!isAuthenticated) {
+  if (isUserLoading) {
+    return <Skeleton className="h-9 w-20" />;
+  }
+
+  if (!user) {
     return (
       <Button asChild>
         <Link href="/login">Login</Link>
@@ -31,17 +36,17 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-9 w-9">
-            <AvatarImage src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="@user" />
-            <AvatarFallback>U</AvatarFallback>
+            <AvatarImage src={user.photoURL || `https://i.pravatar.cc/150?u=${user.uid}`} alt={user.displayName || "user"} />
+            <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">User</p>
+            <p className="text-sm font-medium leading-none">{user.displayName || 'User'}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              user@example.com
+              {user.phoneNumber || user.email}
             </p>
           </div>
         </DropdownMenuLabel>

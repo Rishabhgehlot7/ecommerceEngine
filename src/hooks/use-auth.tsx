@@ -1,23 +1,58 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect } from 'react';
+import { useFirebase, useUser as useFirebaseUser } from '@/firebase';
+import {
+  signInWithPhoneNumber as firebaseSignInWithPhoneNumber,
+  RecaptchaVerifier,
+  ConfirmationResult,
+  signOut as firebaseSignOut,
+  User,
+} from 'firebase/auth';
 
 interface AuthContextType {
-  isAuthenticated: boolean;
-  login: () => void;
+  user: User | null;
+  isUserLoading: boolean;
+  signInWithPhoneNumber: (phoneNumber: string) => Promise<ConfirmationResult>;
+  confirmOtp: (confirmationResult: ConfirmationResult, otp: string) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { auth } = useFirebase();
+  const { user, isUserLoading } = useFirebaseUser();
 
-  const login = () => setIsAuthenticated(true);
-  const logout = () => setIsAuthenticated(false);
+  useEffect(() => {
+    if (auth && !window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible',
+        'callback': (response: any) => {
+          // reCAPTCHA solved, allow signInWithPhoneNumber.
+        }
+      });
+    }
+  }, [auth]);
+
+
+  const signInWithPhoneNumber = async (phoneNumber: string): Promise<ConfirmationResult> => {
+    if (!auth) throw new Error("Firebase auth not available");
+    const appVerifier = window.recaptchaVerifier;
+    return firebaseSignInWithPhoneNumber(auth, phoneNumber, appVerifier);
+  };
+
+  const confirmOtp = async (confirmationResult: ConfirmationResult, otp: string) => {
+    await confirmationResult.confirm(otp);
+  };
+
+  const logout = async () => {
+    if (!auth) throw new Error("Firebase auth not available");
+    await firebaseSignOut(auth);
+  };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, isUserLoading, signInWithPhoneNumber, confirmOtp, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -30,3 +65,9 @@ export const useAuth = () => {
   }
   return context;
 };
+
+declare global {
+    interface Window {
+        recaptchaVerifier: RecaptchaVerifier;
+    }
+}

@@ -3,9 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/hooks/use-auth';
 import { CartProvider } from '@/hooks/use-cart';
-import Header from '@/components/layout/header';
-import Footer from '@/components/layout/footer';
 import { cn } from '@/lib/utils';
+import RootLayoutClient from './layout-client';
 
 export const metadata: Metadata = {
   title: 'BlueCart',
@@ -27,11 +26,7 @@ export default function RootLayout({
       <body className={cn('h-full font-body antialiased')}>
         <AuthProvider>
           <CartProvider>
-            <div className="flex min-h-full flex-col">
-              <Header />
-              <main className="flex-1">{children}</main>
-              <Footer />
-            </div>
+            <RootLayoutClient>{children}</RootLayoutClient>
             <Toaster />
           </CartProvider>
         </AuthProvider>

@@ -1,3 +1,52 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "blue-watch",
+      "description": "A stylish blue watch on a wrist.",
+      "imageUrl": "https://images.unsplash.com/photo-1664730022301-2019f0ecf14d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxibHVlJTIwd2F0Y2h8ZW58MHx8fHwxNzYyMDIyMzM0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "blue watch"
+    },
+    {
+      "id": "wireless-headphones",
+      "description": "Sleek wireless headphones.",
+      "imageUrl": "https://images.unsplash.com/photo-1491927570842-0261e477d937?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8d2lyZWxlc3MlMjBoZWFkcGhvbmVzfGVufDB8fHx8MTc2MjAxMjUyNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "wireless headphones"
+    },
+    {
+      "id": "smart-speaker",
+      "description": "A smart speaker on a table.",
+      "imageUrl": "https://images.unsplash.com/photo-1511842745775-b366af36db2a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzbWFydCUyMHNwZWFrZXJ8ZW58MHx8fHwxNzYxOTc0MzE5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart speaker"
+    },
+    {
+      "id": "leather-backpack",
+      "description": "A brown leather backpack.",
+      "imageUrl": "https://images.unsplash.com/photo-1617179918913-f4e099813fb5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsZWF0aGVyJTIwYmFja3BhY2t8ZW58MHx8fHwxNzYxOTgzMDMyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "leather backpack"
+    },
+    {
+      "id": "coffee-maker",
+      "description": "A modern coffee maker.",
+      "imageUrl": "https://images.unsplash.com/photo-1515442094343-9a10f85a4b79?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y29mZmVlJTIwbWFrZXJ8ZW58MHx8fHwxNzYxOTQ1ODAzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coffee maker"
+    },
+    {
+      "id": "ergonomic-chair",
+      "description": "An ergonomic office chair.",
+      "imageUrl": "https://images.unsplash.com/photo-1612372606404-0ab33e7187ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxvZmZpY2UlMjBjaGFpcnxlbnwwfHx8fDE3NjE5MzQxMDF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "office chair"
+    },
+    {
+      "id": "drone-camera",
+      "description": "A flying drone with a camera.",
+      "imageUrl": "https://images.unsplash.com/photo-1531635410863-4c7d45c6f712?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxkcm9uZSUyMGNhbWVyYXxlbnwwfHx8fDE3NjE5MjI5NjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "drone camera"
+    },
+    {
+      "id": "running-shoes",
+      "description": "A pair of colorful running shoes.",
+      "imageUrl": "https://images.unsplash.com/photo-1469395446868-fb6a048d5ca3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxydW5uaW5nJTIwc2hvZXN8ZW58MHx8fHwxNzYxOTc5MTQ4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "running shoes"
+    }
+  ]
 }

@@ -7,4 +7,7 @@ export type ImagePlaceholder = {
   imageHint: string;
 };
 
-export const PlaceHolderImages: ImagePlaceholder[] = data.placeholderImages;
+// Provides a type assertion for the JSON data
+const typedPlaceholderImages: ImagePlaceholder[] = data.placeholderImages as ImagePlaceholder[];
+
+export const PlaceHolderImages: ImagePlaceholder[] = typedPlaceholderImages;

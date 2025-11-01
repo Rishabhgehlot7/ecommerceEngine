@@ -65,6 +65,24 @@
       "description": "Someone enjoying coffee from a coffee maker.",
       "imageUrl": "https://images.unsplash.com/photo-1595475038699-283c9aa41e09?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBjb2ZmZWV8ZW58MHx8fHwxNzYxOTQwOTM5fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "person coffee"
+    },
+    {
+      "id": "category-electronics",
+      "description": "A collection of various electronic gadgets.",
+      "imageUrl": "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxlbGVjdHJvbmljcyUyMGdhZGdldHN8ZW58MHx8fHwxNzYyMTU0ODkxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "electronic gadgets"
+    },
+    {
+      "id": "category-fashion",
+      "description": "Stylish clothing and accessories on display.",
+      "imageUrl": "https://images.unsplash.com/photo-1445205170230-053b83016050?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmYXNoaW9uJTIwY2xvdGhpbmd8ZW58MHx8fHwxNzYyMTU0OTU1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "fashion clothing"
+    },
+    {
+      "id": "category-home",
+      "description": "A cozy and modern living room.",
+      "imageUrl": "https://images.unsplash.com/photo-1618220179428-22790b461013?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjb3p5JTIwbGl2aW5nJTIwcm9vbXxlbnwwfHx8fDE3NjIxNTUwMDh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "living room"
     }
   ]
 }

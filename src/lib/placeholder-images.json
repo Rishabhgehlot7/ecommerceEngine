@@ -67,6 +67,18 @@
       "imageHint": "person coffee"
     },
     {
+      "id": "hero-slide-4",
+      "description": "A smart speaker in a modern living room setting.",
+      "imageUrl": "https://images.unsplash.com/photo-1533777857984-535d4c39386c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxzbWFydCUyMHNwZWFrZXIlMjBsaWZlc3R5bGV8ZW58MHx8fHwxNzYyMzkxOTIwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart speaker"
+    },
+    {
+      "id": "hero-slide-5",
+      "description": "A person's feet in running shoes, mid-stride.",
+      "imageUrl": "https://images.unsplash.com/photo-1542280756-31016674ac77?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxydW5uaW5nJTIwc2hvZXMlMjBhY3Rpb258ZW58MHx8fHwxNzYyMzkxOTYxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "running shoes"
+    },
+    {
       "id": "category-electronics",
       "description": "A collection of various electronic gadgets.",
       "imageUrl": "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxlbGVjdHJvbmljcyUyMGdhZGdldHN8ZW58MHx8fHwxNzYyMTU0ODkxfDA&ixlib=rb-4.1.0&q=80&w=1080",

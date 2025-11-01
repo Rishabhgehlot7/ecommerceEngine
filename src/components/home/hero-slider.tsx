@@ -42,6 +42,22 @@ export default function HeroSlider() {
       buttonLink: '/products/coffee-maker',
       image: sliderImages.find((img) => img.id === 'hero-slide-3'),
     },
+    {
+      id: 'slide4',
+      title: 'Smart Home, Smart Sound',
+      subtitle: 'Meet the new EchoSphere',
+      buttonText: 'Shop Smart Speakers',
+      buttonLink: '/products/smart-speaker',
+      image: sliderImages.find((img) => img.id === 'hero-slide-4'),
+    },
+    {
+      id: 'slide5',
+      title: 'Engineered for Speed',
+      subtitle: 'The Velocity Runners',
+      buttonText: 'Shop Running Shoes',
+      buttonLink: '/products/running-shoes',
+      image: sliderImages.find((img) => img.id === 'hero-slide-5'),
+    },
   ];
 
   return (
@@ -86,3 +102,5 @@ export default function HeroSlider() {
     </div>
   );
 }
+
+    

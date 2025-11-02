@@ -14,24 +14,26 @@ import { Textarea } from '@/components/ui/textarea';
 import { addCategory } from '@/lib/actions/category.actions';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import Image from 'next/image';
+import ImageDropzone from '@/components/admin/image-dropzone';
 
 export default function NewCategoryPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImagePreview(URL.createObjectURL(file));
-    }
-  };
-  
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     const formData = new FormData(event.currentTarget);
+    
+    // Check if an image file is present
+    const imageFile = formData.get('image') as File;
+    if (!imageFile || imageFile.size === 0) {
+        // You might want to show a toast or an error message here
+        alert('Please select an image for the category.');
+        setLoading(false);
+        return;
+    }
+
     try {
       await addCategory(formData);
       router.push('/admin/categories');
@@ -75,14 +77,8 @@ export default function NewCategoryPage() {
                 <CardHeader>
                 <CardTitle>Category Image</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    {imagePreview && (
-                        <div className="aspect-square overflow-hidden rounded-md border">
-                        <Image src={imagePreview} alt="Image preview" width={300} height={300} className="h-full w-full object-cover" />
-                        </div>
-                    )}
-                    <Label htmlFor="image">Image</Label>
-                    <Input id="image" name="image" type="file" required onChange={handleImageChange} />
+                <CardContent>
+                    <ImageDropzone name="image" />
                 </CardContent>
             </Card>
             <Button size="lg" type="submit" className="w-full" disabled={loading}>

@@ -14,15 +14,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { getCategory, updateCategory } from '@/lib/actions/category.actions';
 import type { ICategory } from '@/models/Category';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
+import ImageDropzone from '@/components/admin/image-dropzone';
 
 export default function EditCategoryPage({ params }: { params: { id: string } }) {
   const [category, setCategory] = useState<ICategory | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [newSubcategoryName, setNewSubcategoryName] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -32,19 +31,9 @@ export default function EditCategoryPage({ params }: { params: { id: string } })
     async function fetchCategory() {
       const cat = await getCategory(params.id);
       setCategory(cat);
-      if (cat.image) {
-        setImagePreview(cat.image);
-      }
     }
     fetchCategory();
   }, [params.id]);
-  
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImagePreview(URL.createObjectURL(file));
-    }
-  };
 
   const handleAddSubcategory = () => {
     if (newSubcategoryName.trim() && category) {
@@ -164,13 +153,8 @@ export default function EditCategoryPage({ params }: { params: { id: string } })
             <CardHeader>
               <CardTitle>Category Image</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {imagePreview && (
-                 <div className="aspect-square overflow-hidden rounded-md border">
-                    <Image src={imagePreview} alt={category.name} width={300} height={300} className="h-full w-full object-cover" />
-                 </div>
-              )}
-              <Input id="image" name="image" type="file" onChange={handleImageChange} />
+            <CardContent>
+              <ImageDropzone name="image" initialImage={category.image} />
               <Input type="hidden" name="currentImage" defaultValue={category.image} />
             </CardContent>
           </Card>

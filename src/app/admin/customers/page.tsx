@@ -24,9 +24,19 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { customers } from '@/lib/customers';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import type { UserProfile } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminCustomersPage() {
+  const firestore = useFirestore();
+  const usersCollection = useMemoFirebase(
+    () => collection(firestore, 'users'),
+    [firestore]
+  );
+  const { data: users, isLoading } = useCollection<UserProfile>(usersCollection);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -46,7 +56,7 @@ export default function AdminCustomersPage() {
         <CardHeader>
           <CardTitle>Customer List</CardTitle>
           <CardDescription>
-            A list of all customers who have placed orders.
+            A list of all registered users in your store.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -55,31 +65,52 @@ export default function AdminCustomersPage() {
               <TableRow>
                 <TableHead>Customer</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Orders</TableHead>
-                <TableHead className="text-right">Total Spent</TableHead>
+                <TableHead>Phone Number</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {customers.map((customer) => (
-                <TableRow key={customer.id}>
+              {isLoading && (
+                <>
+                  {[...Array(5)].map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Skeleton className="h-8 w-8 rounded-full" />
+                          <Skeleton className="h-4 w-[100px]" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-[150px]" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-[120px]" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-end">
+                          <Skeleton className="h-8 w-8" />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
+              {!isLoading && users && users.map((user) => (
+                <TableRow key={user.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={`https://i.pravatar.cc/40?u=${customer.email}`} alt={customer.name} />
-                        <AvatarFallback>{customer.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={`https://i.pravatar.cc/40?u=${user.email || user.id}`} alt={`${user.firstName} ${user.lastName}`} />
+                        <AvatarFallback>{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <span>{customer.name}</span>
+                      <span>{user.firstName} {user.lastName}</span>
                     </div>
                   </TableCell>
-                  <TableCell>{customer.email}</TableCell>
-                  <TableCell>{customer.orderCount}</TableCell>
+                  <TableCell>{user.email || 'N/A'}</TableCell>
+                  <TableCell>{user.phoneNumber}</TableCell>
                   <TableCell className="text-right">
-                    {formatPrice(customer.totalSpent)}
-                  </TableCell>
-                  <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button aria-haspopup="true" size="icon" variant="ghost">
@@ -98,6 +129,11 @@ export default function AdminCustomersPage() {
               ))}
             </TableBody>
           </Table>
+           {!isLoading && (!users || users.length === 0) && (
+              <div className="py-10 text-center text-muted-foreground">
+                No customers found.
+              </div>
+            )}
         </CardContent>
       </Card>
     </div>

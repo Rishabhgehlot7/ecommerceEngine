@@ -1,4 +1,5 @@
-'use client';
+
+
 import {
   Card,
   CardContent,
@@ -14,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, PlusCircle } from 'lucide-react';
 import {
@@ -25,19 +25,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
-import { categories } from '@/lib/categories';
-import { products } from '@/lib/products';
-import { useMemo } from 'react';
+import { getAllCategories } from '@/lib/actions/category.actions';
+import Image from 'next/image';
+import DeleteCategoryButton from '@/components/admin/categories/delete-category-button';
 
-export default function AdminCategoriesPage() {
-  const categoryProductCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    products.forEach(product => {
-      counts.set(product.category, (counts.get(product.category) || 0) + 1);
-    });
-    return counts;
-  }, []);
-
+export default async function AdminCategoriesPage() {
+  const categories = await getAllCategories();
 
   return (
     <div className="space-y-6">
@@ -63,9 +56,9 @@ export default function AdminCategoriesPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Image</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Sub-categories</TableHead>
-                <TableHead>Products</TableHead>
+                <TableHead>Description</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
@@ -73,12 +66,12 @@ export default function AdminCategoriesPage() {
             </TableHeader>
             <TableBody>
               {categories.map((category) => (
-                <TableRow key={category.id}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
+                <TableRow key={category._id}>
                   <TableCell>
-                    <Badge variant="outline">{category.subcategories.length}</Badge>
+                    <Image src={category.image} alt={category.name} width={50} height={50} />
                   </TableCell>
-                  <TableCell>{categoryProductCounts.get(category.id) || 0}</TableCell>
+                  <TableCell className="font-medium">{category.name}</TableCell>
+                  <TableCell>{category.description}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -89,8 +82,12 @@ export default function AdminCategoriesPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>Delete</DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/admin/categories/${category._id}/edit`}>Edit</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                           <DeleteCategoryButton id={category._id} />
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

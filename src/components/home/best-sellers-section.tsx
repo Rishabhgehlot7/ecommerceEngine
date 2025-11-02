@@ -6,7 +6,7 @@ import ProductCard from '../products/product-card';
 export default function BestSellersSection() {
   // In a real app, this would be determined by sales data.
   // For now, we'll just pick a few products to feature.
-  const bestSellers = products.slice(0, 4).sort(() => 0.5 - Math.random());
+  const bestSellers = products.slice(0, 4);
 
   return (
     <div className="py-12">

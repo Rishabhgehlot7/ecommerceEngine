@@ -1,29 +1,195 @@
-import type { Product } from '@/lib/types';
+import type { Product, ProductMedia } from '@/lib/types';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-const productDetails = [
-  { id: 'blue-watch', name: 'Azure Timepiece', description: 'A beautifully crafted watch with a deep blue face and a stainless steel strap. Perfect for any occasion.', price: 249.99, category: 'fashion' },
-  { id: 'wireless-headphones', name: 'SoundScape Pro', description: 'Immerse yourself in high-fidelity audio with these noise-cancelling wireless headphones. 30-hour battery life.', price: 179.99, salePrice: 149.99, category: 'electronics' },
-  { id: 'smart-speaker', name: 'EchoSphere', description: 'Your personal AI assistant, ready to play music, answer questions, and control your smart home. Rich, room-filling sound.', price: 89.99, category: 'electronics' },
-  { id: 'leather-backpack', name: 'The Voyager', description: 'A durable and stylish backpack made from genuine leather. Features multiple compartments and a padded laptop sleeve.', price: 129.99, category: 'fashion' },
-  { id: 'coffee-maker', name: 'Morning BrewMaster', description: 'Start your day right with the perfect cup of coffee. This programmable machine offers various brew strengths.', price: 79.99, salePrice: 64.99, category: 'home' },
-  { id: 'ergonomic-chair', name: 'Ortho-Comfort+', description: 'Support your posture during long work hours with this fully adjustable ergonomic office chair. Breathable mesh back.', price: 399.99, category: 'home' },
-  { id: 'drone-camera', name: 'Sky-Explorer V2', description: 'Capture stunning 4K aerial footage with this easy-to-fly drone. Features a 3-axis gimbal and intelligent flight modes.', price: 499.99, salePrice: 449.99, category: 'electronics' },
-  { id: 'running-shoes', name: 'Velocity Runners', description: 'Lightweight and responsive running shoes designed for speed and comfort. Ideal for road running and marathons.', price: 119.99, category: 'fashion' }
+type ProductData = Omit<Product, 'media'> & { mediaIds: string[] };
+
+const productDetails: ProductData[] = [
+  { 
+    id: 'blue-watch', 
+    name: 'Azure Timepiece', 
+    description: 'A beautifully crafted watch with a deep blue face and a stainless steel strap. Perfect for any occasion.', 
+    price: 249.99, 
+    category: 'fashion',
+    mediaIds: ['blue-watch', 'blue-watch-2', 'blue-watch-3'],
+    highlights: [
+      'Swiss quartz movement',
+      'Sapphire crystal glass',
+      'Water-resistant up to 50m',
+      '2-year international warranty'
+    ],
+    specifications: {
+      'Case Material': 'Stainless Steel',
+      'Strap Material': 'Stainless Steel',
+      'Case Diameter': '42mm',
+      'Movement': 'Swiss Quartz',
+    }
+  },
+  { 
+    id: 'wireless-headphones', 
+    name: 'SoundScape Pro', 
+    description: 'Immerse yourself in high-fidelity audio with these noise-cancelling wireless headphones. 30-hour battery life.', 
+    price: 179.99, 
+    salePrice: 149.99, 
+    category: 'electronics',
+    mediaIds: ['wireless-headphones', 'wireless-headphones-2', 'wireless-headphones-3'],
+    highlights: [
+      'Active Noise Cancellation',
+      '30-hour battery life',
+      'Bluetooth 5.2 connectivity',
+      'Comfortable over-ear design'
+    ],
+    specifications: {
+      'Driver Size': '40mm',
+      'Frequency Response': '20Hz - 20kHz',
+      'Connectivity': 'Bluetooth 5.2, 3.5mm jack',
+      'Weight': '250g'
+    }
+  },
+  { 
+    id: 'smart-speaker', 
+    name: 'EchoSphere', 
+    description: 'Your personal AI assistant, ready to play music, answer questions, and control your smart home. Rich, room-filling sound.', 
+    price: 89.99, 
+    category: 'electronics',
+    mediaIds: ['smart-speaker'],
+    highlights: [
+      'Voice-controlled AI assistant',
+      '360-degree sound',
+      'Multi-room audio',
+      'Smart home integration'
+    ],
+    specifications: {
+        'Connectivity': 'Wi-Fi, Bluetooth',
+        'Dimensions': '5.7" x 3.9"',
+        'Power': 'AC Adapter'
+    }
+  },
+  { 
+    id: 'leather-backpack', 
+    name: 'The Voyager', 
+    description: 'A durable and stylish backpack made from genuine leather. Features multiple compartments and a padded laptop sleeve.', 
+    price: 129.99, 
+    category: 'fashion',
+    mediaIds: ['leather-backpack'],
+    highlights: [
+        'Genuine full-grain leather',
+        'Padded 15" laptop sleeve',
+        'Multiple interior pockets',
+        'Comfortable shoulder straps'
+    ],
+    specifications: {
+        'Material': 'Full-grain leather',
+        'Dimensions': '18" x 12" x 6"',
+        'Capacity': '20L'
+    }
+  },
+  { 
+    id: 'coffee-maker', 
+    name: 'Morning BrewMaster', 
+    description: 'Start your day right with the perfect cup of coffee. This programmable machine offers various brew strengths.', 
+    price: 79.99, 
+    salePrice: 64.99, 
+    category: 'home',
+    mediaIds: ['coffee-maker'],
+     highlights: [
+        'Programmable 24-hour timer',
+        'Adjustable brew strength',
+        '12-cup glass carafe',
+        'Pause and serve function'
+    ],
+    specifications: {
+        'Capacity': '12 cups',
+        'Material': 'Stainless Steel & Plastic',
+        'Filter': 'Reusable mesh filter'
+    }
+  },
+  { 
+    id: 'ergonomic-chair', 
+    name: 'Ortho-Comfort+', 
+    description: 'Support your posture during long work hours with this fully adjustable ergonomic office chair. Breathable mesh back.', 
+    price: 399.99, 
+    category: 'home',
+    mediaIds: ['ergonomic-chair'],
+    highlights: [
+        'Adjustable lumbar support',
+        '4D adjustable armrests',
+        'Breathable mesh back',
+        'Recline and tilt lock'
+    ],
+    specifications: {
+        'Material': 'Mesh, Aluminum, Foam',
+        'Weight Capacity': '300 lbs',
+        'Adjustments': 'Height, Armrests, Lumbar, Tilt'
+    }
+  },
+  { 
+    id: 'drone-camera', 
+    name: 'Sky-Explorer V2', 
+    description: 'Capture stunning 4K aerial footage with this easy-to-fly drone. Features a 3-axis gimbal and intelligent flight modes.', 
+    price: 499.99, 
+    salePrice: 449.99, 
+    category: 'electronics',
+    mediaIds: ['drone-camera'],
+    highlights: [
+        '4K video at 30fps',
+        '3-axis gimbal stabilization',
+        '30-minute flight time',
+        'Intelligent flight modes (Follow Me, Orbit)'
+    ],
+    specifications: {
+        'Max Flight Time': '30 minutes',
+        'Video Resolution': '4K UHD',
+        'Range': '5 km',
+        'Weight': '570g'
+    }
+  },
+  { 
+    id: 'running-shoes', 
+    name: 'Velocity Runners', 
+    description: 'Lightweight and responsive running shoes designed for speed and comfort. Ideal for road running and marathons.', 
+    price: 119.99, 
+    category: 'fashion',
+    mediaIds: ['running-shoes'],
+    highlights: [
+        'Ultra-lightweight foam sole',
+        'Breathable knit upper',
+        'High-traction outsole',
+        '8mm heel-to-toe drop'
+    ],
+    specifications: {
+        'Best For': 'Road Running',
+        'Cushioning': 'Medium',
+        'Weight (per shoe)': '8.5 oz'
+    }
+  }
 ];
 
 export const products: Product[] = productDetails.map(detail => {
-  const placeholder = PlaceHolderImages.find(p => p.id === detail.id);
-  if (!placeholder) {
-    throw new Error(`Placeholder image not found for product id: ${detail.id}`);
-  }
+  const mediaItems: ProductMedia[] = detail.mediaIds.map(id => {
+    const placeholder = PlaceHolderImages.find(p => p.id === id);
+    if (!placeholder) {
+      throw new Error(`Placeholder image not found for media id: ${id}`);
+    }
+    return {
+      type: 'image',
+      url: placeholder.imageUrl,
+      alt: placeholder.description,
+      imageHint: placeholder.imageHint
+    };
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { mediaIds, ...rest } = detail;
+  
   return {
-    ...detail,
-    image: placeholder.imageUrl,
-    imageHint: placeholder.imageHint
+    ...rest,
+    media: mediaItems,
+    image: mediaItems[0].url,
+    imageHint: mediaItems[0].imageHint
   };
 });
 
 export const getProductById = (id: string): Product | undefined => {
   return products.find(p => p.id === id);
 };
+    

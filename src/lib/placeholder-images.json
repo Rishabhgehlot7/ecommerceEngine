@@ -7,15 +7,39 @@
       "imageHint": "blue watch"
     },
     {
+      "id": "blue-watch-2",
+      "description": "A close-up of a blue watch face.",
+      "imageUrl": "https://images.unsplash.com/photo-1619134734509-5c743827a5d3?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "watch face"
+    },
+    {
+      "id": "blue-watch-3",
+      "description": "A person wearing a blue watch.",
+      "imageUrl": "https://images.unsplash.com/photo-1588040218381-e8f0b0c6374f?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "watch lifestyle"
+    },
+    {
       "id": "wireless-headphones",
       "description": "Sleek wireless headphones.",
       "imageUrl": "https://images.unsplash.com/photo-1491927570842-0261e477d937?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8d2lyZWxlc3MlMjBoZWFkcGhvbmVzfGVufDB8fHx8MTc2MjAxMjUyNHww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "wireless headphones"
     },
     {
+      "id": "wireless-headphones-2",
+      "description": "A person wearing wireless headphones.",
+      "imageUrl": "https://images.unsplash.com/photo-1546435770-a3e426bf4022?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "headphones lifestyle"
+    },
+    {
+      "id": "wireless-headphones-3",
+      "description": "Wireless headphones on a charging stand.",
+      "imageUrl": "https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "headphones charging"
+    },
+    {
       "id": "smart-speaker",
       "description": "A smart speaker on a table.",
-      "imageUrl": "https://images.unsplash.com/photo-1511842745775-b366af36db2a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzbWFydCUyMHNwZWFrZXJ8ZW58MHx8fHwxNzYxOTc0MzE5fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1533730999026-c65b68265089?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "imageHint": "smart speaker"
     },
     {

@@ -1,12 +1,22 @@
+export type ProductMedia = {
+  type: 'image' | 'video';
+  url: string;
+  alt: string;
+  imageHint: string;
+}
+
 export type Product = {
   id: string;
   name: string;
   description: string;
   price: number;
   salePrice?: number;
-  image: string;
+  image: string; // Keep main image for card views
   imageHint: string;
+  media: ProductMedia[];
   category: string;
+  highlights?: string[];
+  specifications?: Record<string, string>;
 };
 
 export type CartItem = {
@@ -40,7 +50,7 @@ export type Order = {
 export type UserProfile = {
   id: string;
   firstName: string;
-  lastName: string;
+  lastName:string;
   email: string;
   phoneNumber?: string;
   shippingAddress?: string;
@@ -68,3 +78,5 @@ export type Category = {
     href: string;
   }[];
 };
+
+    

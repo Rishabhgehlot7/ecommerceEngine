@@ -1,3 +1,4 @@
+
 'use client';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,33 +18,71 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { PlusCircle, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { addProduct } from '@/lib/actions/product.actions';
+import { useRouter } from 'next/navigation';
+import { getAllCategories } from '@/lib/actions/category.actions';
+import type { ICategory } from '@/models/Category';
 import Image from 'next/image';
+import { UploadCloud, X } from 'lucide-react';
+import { useDropzone } from 'react-dropzone';
 
 export default function NewProductPage() {
-  const [variants, setVariants] = useState([{ name: '', price: '', stock: '' }]);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
 
-  const addVariant = () => {
-    setVariants([...variants, { name: '', price: '', stock: '' }]);
+  useEffect(() => {
+    async function fetchCategories() {
+        const cats = await getAllCategories();
+        setCategories(cats);
+    }
+    fetchCategories();
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: { 'image/*': [] },
+    onDrop: (acceptedFiles) => {
+      const newFiles = [...files, ...acceptedFiles];
+      setFiles(newFiles);
+      const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+      setPreviews(newPreviews);
+    },
+  });
+
+  const removeImage = (index: number) => {
+    const newFiles = files.filter((_, i) => i !== index);
+    const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+    setFiles(newFiles);
+    setPreviews(newPreviews);
   };
 
-  const removeVariant = (index: number) => {
-    const newVariants = variants.filter((_, i) => i !== index);
-    setVariants(newVariants);
-  };
-  
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImagePreview(URL.createObjectURL(file));
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(event.currentTarget);
+    files.forEach(file => {
+      formData.append('images', file);
+    });
+
+    try {
+      await addProduct(formData);
+      router.push('/admin/products');
+    } catch (error) {
+      console.error('Failed to add product:', error);
+      alert('Failed to add product. See console for details.');
+    } finally {
+      setLoading(false);
     }
   };
 
 
   return (
-    <div className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
        <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Add New Product</h2>
@@ -59,57 +98,49 @@ export default function NewProductPage() {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="name">Product Name</Label>
-                <Input id="name" placeholder="e.g. Summer T-Shirt" />
+                <Input id="name" name="name" placeholder="e.g. Summer T-Shirt" required />
               </div>
               <div>
                 <Label htmlFor="description">Description</Label>
-                <Textarea id="description" placeholder="A short description of the product." />
+                <Textarea id="description" name="description" placeholder="A short description of the product." required />
               </div>
-              <div>
-                <Label htmlFor="price">Base Price</Label>
-                <Input id="price" type="number" placeholder="19.99" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Product Variants</CardTitle>
-              <Button variant="outline" size="sm" onClick={addVariant}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add Variant
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {variants.map((variant, index) => (
-                <div key={index} className="grid grid-cols-3 gap-4 items-end">
-                  <div>
-                    <Label htmlFor={`variant-name-${index}`}>Variant Name</Label>
-                    <Input id={`variant-name-${index}`} placeholder="e.g. Color, Size" />
-                  </div>
-                  <div>
-                    <Label htmlFor={`variant-value-${index}`}>Options</Label>
-                    <Input id={`variant-value-${index}`} placeholder="e.g. Red, Blue, Green" />
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={() => removeVariant(index)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div>
+                  <Label htmlFor="price">Price</Label>
+                  <Input id="price" name="price" type="number" step="0.01" placeholder="19.99" required/>
                 </div>
-              ))}
+                 <div>
+                  <Label htmlFor="salePrice">Sale Price (Optional)</Label>
+                  <Input id="salePrice" name="salePrice" type="number" step="0.01" placeholder="14.99" />
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Product Image</CardTitle>
+              <CardTitle>Product Images</CardTitle>
+              <CardDescription>Add one or more images for your product.</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {imagePreview && (
-                <div className="aspect-square overflow-hidden rounded-md border">
-                  <Image src={imagePreview} alt="Image preview" width={300} height={300} className="h-full w-full object-cover" />
+            <CardContent>
+                <div {...getRootProps()} className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer ${isDragActive ? 'border-primary' : 'border-input'}`}>
+                    <input {...getInputProps()} />
+                    <UploadCloud className="w-10 h-10 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Drag & drop or click to upload</p>
                 </div>
-              )}
-              <Label htmlFor="picture">Picture</Label>
-              <Input id="picture" type="file" onChange={handleImageChange} />
+                {previews.length > 0 && (
+                    <div className="mt-4 grid grid-cols-3 gap-4">
+                        {previews.map((src, index) => (
+                            <div key={index} className="relative">
+                                <Image src={src} alt={`Preview ${index + 1}`} width={100} height={100} className="rounded-md object-cover w-full aspect-square" />
+                                <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6" onClick={() => removeImage(index)}>
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </CardContent>
           </Card>
           <Card>
@@ -117,21 +148,25 @@ export default function NewProductPage() {
               <CardTitle>Category</CardTitle>
             </CardHeader>
             <CardContent>
-              <Select>
+              <Select name="category" required>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="clothing">Clothing</SelectItem>
-                  <SelectItem value="accessories">Accessories</SelectItem>
-                  <SelectItem value="electronics">Electronics</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category._id} value={category._id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </CardContent>
           </Card>
-           <Button size="lg" className="w-full">Save Product</Button>
+           <Button size="lg" type="submit" className="w-full" disabled={loading}>
+            {loading ? 'Saving...' : 'Save Product'}
+           </Button>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

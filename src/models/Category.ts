@@ -28,6 +28,4 @@ const CategorySchema: Schema = new Schema({
   subcategories: { type: [SubcategorySchema], default: [] },
 });
 
-CategorySchema.index({ 'subcategories.slug': 1 }, { unique: true, sparse: true });
-
 export default mongoose.models.Category || mongoose.model<ICategory>('Category', CategorySchema);

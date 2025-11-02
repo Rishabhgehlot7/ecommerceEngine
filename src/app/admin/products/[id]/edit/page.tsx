@@ -11,7 +11,7 @@ import { getProduct, updateProduct } from '@/lib/actions/product.actions';
 import { getAllCategories } from '@/lib/actions/category.actions';
 import type { IProduct, IVariant, IDimensions } from '@/models/Product';
 import type { ICategory } from '@/models/Category';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -30,6 +30,31 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const [previews, setPreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [variants, setVariants] = useState<Partial<IVariant>[]>([{ name: '', sku: '', price: 0, stock: 0, options: [{ name: '', value: ''}] }]);
+  const [productName, setProductName] = useState('');
+
+  const generateSku = useCallback((vIndex: number) => {
+    const productPrefix = productName.slice(0, 5).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const variantOptions = variants[vIndex].options?.map(opt => opt.value.slice(0, 3).toUpperCase().replace(/[^A-Z0-9]/g, '')).join('-') || '';
+    const randomSuffix = Math.random().toString(36).substring(2, 5).toUpperCase();
+    
+    const newSku = `${productPrefix}-${variantOptions}-${randomSuffix}`;
+
+    const newVariants = [...variants];
+    newVariants[vIndex].sku = newSku;
+    setVariants(newVariants);
+  }, [productName, variants]);
+
+  useEffect(() => {
+    // When product name changes, regenerate SKUs for all variants that don't have a manually set one.
+    variants.forEach((_, vIndex) => {
+        // A simple check to avoid overwriting user-entered SKUs. 
+        // This could be more robust, e.g., by tracking which SKUs are auto-generated.
+        if (!variants[vIndex].sku || variants[vIndex].sku?.startsWith(productName.slice(0,5).toUpperCase())) {
+            generateSku(vIndex);
+        }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productName]);
 
   useEffect(() => {
     async function fetchData() {
@@ -40,11 +65,19 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       setProduct(prod);
       setCategories(cats);
       if (prod) {
+          setProductName(prod.name);
           const imageUrls = prod.media.map(m => m.url);
           setExistingImages(imageUrls);
           setPreviews(imageUrls);
           if (prod.variants && prod.variants.length > 0) {
             setVariants(prod.variants.map(v => ({...v})));
+          } else {
+            // If no variants, start with one empty one and generate an initial SKU
+            const newVariants = [{ name: '', sku: '', price: 0, stock: 0, options: [{ name: '', value: ''}] }];
+            const productPrefix = prod.name.slice(0, 5).toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const randomSuffix = Math.random().toString(36).substring(2, 5).toUpperCase();
+            newVariants[0].sku = `${productPrefix}--${randomSuffix}`;
+            setVariants(newVariants);
           }
       }
     }
@@ -93,6 +126,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       if (newVariants[vIndex].options) {
         newVariants[vIndex].options![oIndex][field] = value;
         setVariants(newVariants);
+        generateSku(vIndex);
       }
   };
 
@@ -175,7 +209,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           <Card>
             <CardHeader><CardTitle>Product Details</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div><Label htmlFor="name">Product Name</Label><Input id="name" name="name" defaultValue={product.name} required /></div>
+              <div><Label htmlFor="name">Product Name</Label><Input id="name" name="name" value={productName} onChange={(e) => setProductName(e.target.value)} required /></div>
               <div><Label htmlFor="description">Description</Label><Textarea id="description" name="description" defaultValue={product.description} required /></div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                  <div><Label htmlFor="price">Price</Label><Input id="price" name="price" type="number" step="0.01" defaultValue={product.price} required/></div>
@@ -204,7 +238,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <Label htmlFor={`variant-sku-${vIndex}`}>SKU</Label>
-                        <Input id={`variant-sku-${vIndex}`} placeholder="TSHIRT-BLUE-M" value={variant.sku || ''} onChange={(e) => handleVariantChange(vIndex, 'sku', e.target.value)} />
+                        <Input id={`variant-sku-${vIndex}`} placeholder="Auto-generated SKU" value={variant.sku || ''} onChange={(e) => handleVariantChange(vIndex, 'sku', e.target.value)} required />
                     </div>
                     <div>
                         <Label htmlFor={`variant-price-${vIndex}`}>Variant Price</Label>

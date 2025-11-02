@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { addProduct } from '@/lib/actions/product.actions';
 import { useRouter } from 'next/navigation';
 import { getAllCategories } from '@/lib/actions/category.actions';
@@ -36,6 +36,7 @@ export default function NewProductPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [variants, setVariants] = useState<Partial<IVariant>[]>([{ name: '', sku: '', price: 0, stock: 0, options: [{ name: '', value: ''}] }]);
+  const [productName, setProductName] = useState('');
 
   useEffect(() => {
     async function fetchCategories() {
@@ -44,6 +45,27 @@ export default function NewProductPage() {
     }
     fetchCategories();
   }, []);
+
+  const generateSku = useCallback((vIndex: number) => {
+    const productPrefix = productName.slice(0, 5).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const variantOptions = variants[vIndex].options?.map(opt => opt.value.slice(0, 3).toUpperCase().replace(/[^A-Z0-9]/g, '')).join('-') || '';
+    const randomSuffix = Math.random().toString(36).substring(2, 5).toUpperCase();
+    
+    const newSku = `${productPrefix}-${variantOptions}-${randomSuffix}`;
+
+    const newVariants = [...variants];
+    newVariants[vIndex].sku = newSku;
+    setVariants(newVariants);
+  }, [productName, variants]);
+
+  useEffect(() => {
+    // When product name changes, regenerate SKUs for all variants that don't have a manually set one.
+    // This is a simplified approach. A more complex one would track if SKU was user-modified.
+    variants.forEach((_, vIndex) => {
+        generateSku(vIndex);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productName]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { 'image/*': [] },
@@ -83,6 +105,8 @@ export default function NewProductPage() {
       if (newVariants[vIndex].options) {
         newVariants[vIndex].options![oIndex][field] = value;
         setVariants(newVariants);
+        // Regenerate SKU when options change
+        generateSku(vIndex);
       }
   };
 
@@ -152,7 +176,14 @@ export default function NewProductPage() {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="name">Product Name</Label>
-                <Input id="name" name="name" placeholder="e.g. Summer T-Shirt" required />
+                <Input 
+                  id="name" 
+                  name="name" 
+                  placeholder="e.g. Summer T-Shirt" 
+                  required 
+                  value={productName}
+                  onChange={(e) => setProductName(e.target.value)}
+                />
               </div>
               <div>
                 <Label htmlFor="description">Description</Label>
@@ -191,7 +222,7 @@ export default function NewProductPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <Label htmlFor={`variant-sku-${vIndex}`}>SKU</Label>
-                        <Input id={`variant-sku-${vIndex}`} placeholder="TSHIRT-BLUE-M" value={variant.sku || ''} onChange={(e) => handleVariantChange(vIndex, 'sku', e.target.value)} />
+                        <Input id={`variant-sku-${vIndex}`} placeholder="Auto-generated SKU" value={variant.sku || ''} onChange={(e) => handleVariantChange(vIndex, 'sku', e.target.value)} required />
                     </div>
                     <div>
                         <Label htmlFor={`variant-price-${vIndex}`}>Variant Price</Label>

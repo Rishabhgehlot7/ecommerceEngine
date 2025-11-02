@@ -2,7 +2,7 @@
 'use server';
 
 import dbConnect from '../db';
-import Product, { type IProduct } from '@/models/Product';
+import Product, { type IProduct, type IVariant } from '@/models/Product';
 import Category from '@/models/Category';
 import { revalidatePath } from 'next/cache';
 import { uploadFile } from '../s3';
@@ -41,6 +41,17 @@ async function createUniqueSlug(name: string, productIdToExclude: string | null 
     return slug;
 }
 
+function processVariants(variants: Partial<IVariant>[]): IVariant[] {
+    return variants
+        .filter(v => v.sku)
+        .map(v => {
+            if (!v.name) {
+                v.name = v.options?.map(opt => opt.value).join(' / ');
+            }
+            return v as IVariant;
+        });
+}
+
 
 export async function addProduct(formData: FormData) {
   await dbConnect();
@@ -58,7 +69,9 @@ export async function addProduct(formData: FormData) {
   const height = formData.get('height') ? parseFloat(formData.get('height') as string) : undefined;
 
   const variantsData = formData.get('variants') as string;
-  const variants = variantsData ? JSON.parse(variantsData) : [];
+  const parsedVariants = variantsData ? JSON.parse(variantsData) : [];
+  const variants = processVariants(parsedVariants);
+
 
   if (!name || !description || !price || !categoryId || images.length === 0) {
     throw new Error('Missing required fields');
@@ -121,7 +134,8 @@ export async function updateProduct(id: string, formData: FormData) {
   const height = formData.get('height') ? parseFloat(formData.get('height') as string) : undefined;
   
   const variantsData = formData.get('variants') as string;
-  const variants = variantsData ? JSON.parse(variantsData) : [];
+  const parsedVariants = variantsData ? JSON.parse(variantsData) : [];
+  const variants = processVariants(parsedVariants);
 
   const product = await Product.findById(id);
   if (!product) {

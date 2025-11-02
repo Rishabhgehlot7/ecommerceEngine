@@ -14,6 +14,7 @@ export interface IDimensions {
 }
 
 export interface IVariant {
+  name?: string;
   sku: string;
   options: { name: string; value: string }[];
   price: number;
@@ -51,6 +52,7 @@ const DimensionsSchema: Schema = new Schema({
 }, { _id: false });
 
 const VariantSchema: Schema = new Schema({
+    name: { type: String, trim: true },
     sku: { type: String, required: true, unique: true,sparse: true },
     options: [{
         name: { type: String, required: true }, // e.g., 'Color'

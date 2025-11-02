@@ -35,7 +35,7 @@ export default function NewProductPage() {
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const [variants, setVariants] = useState<Partial<IVariant>[]>([{ sku: '', price: 0, stock: 0, options: [{ name: '', value: ''}] }]);
+  const [variants, setVariants] = useState<Partial<IVariant>[]>([{ name: '', sku: '', price: 0, stock: 0, options: [{ name: '', value: ''}] }]);
 
   useEffect(() => {
     async function fetchCategories() {
@@ -87,7 +87,7 @@ export default function NewProductPage() {
   };
 
   const addVariant = () => {
-      setVariants([...variants, { sku: '', price: 0, stock: 0, options: [{ name: '', value: ''}] }]);
+      setVariants([...variants, { name: '', sku: '', price: 0, stock: 0, options: [{ name: '', value: ''}] }]);
   };
   
   const removeVariant = (index: number) => {
@@ -182,6 +182,12 @@ export default function NewProductPage() {
                     <Trash2 className="h-4 w-4" />
                   </Button>
                   
+                  <div>
+                    <Label htmlFor={`variant-name-${vIndex}`}>Variant Name</Label>
+                    <Input id={`variant-name-${vIndex}`} placeholder="e.g. Blue / Large" value={variant.name || ''} onChange={(e) => handleVariantChange(vIndex, 'name', e.target.value)} />
+                    <p className="text-xs text-muted-foreground mt-1">Leave blank to auto-generate from options.</p>
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <Label htmlFor={`variant-sku-${vIndex}`}>SKU</Label>

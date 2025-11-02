@@ -1,19 +1,5 @@
 
-import mongoose, { Schema, Document } from 'mongoose';
-
-// This will drop the problematic index from the collection.
-// We are temporarily disabling the strict option to allow this operation.
-mongoose.set('strict', false);
-const categoryCollection = mongoose.connection.collections['categories'];
-if (categoryCollection) {
-    categoryCollection.dropIndex('subcategories.slug_1').catch(err => {
-        if (err.code !== 27) { // 27 is "IndexNotFound"
-            console.error('Error dropping index:', err);
-        }
-    });
-}
-mongoose.set('strict', true);
-
+import mongoose, { Schema, Document, models, model } from 'mongoose';
 
 export interface ICategory extends Document {
   _id: string;
@@ -38,27 +24,25 @@ const CategorySchema: Schema = new Schema({
   }],
 }, { timestamps: true });
 
-
-// Ensure that for a given parent, the category name is unique.
 CategorySchema.index({ parent: 1, name: 1 }, { unique: true });
 
 async function createSlug(name: string): Promise<string> {
     const baseSlug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
     let slug = baseSlug;
     let count = 1;
-    const model = this.constructor as mongoose.Model<ICategory>;
-    
+    // get model from this instead of using a global
+    const CategoryModel = models.Category || model<ICategory>('Category', CategorySchema);
+
     // Check for existing slug and append a number if it exists
-    let existingCategory = await model.findOne({ slug });
-    while (existingCategory && existingCategory._id.toString() !== this._id.toString()) {
+    let existingCategory = await CategoryModel.findOne({ slug });
+    while (existingCategory && existingCategory._id.toString() !== (this as any)._id.toString()) {
         slug = `${baseSlug}-${count}`;
         count++;
-        existingCategory = await model.findOne({ slug });
+        existingCategory = await CategoryModel.findOne({ slug });
     }
     return slug;
 }
 
-// Pre-save hook to generate slug and ancestors
 CategorySchema.pre<ICategory>('save', async function (next) {
   if (this.isModified('name') || !this.slug) {
     this.slug = await createSlug.call(this, this.name);
@@ -67,7 +51,8 @@ CategorySchema.pre<ICategory>('save', async function (next) {
   if (this.isModified('parent')) {
     if (this.parent) {
       try {
-        const parentCategory = await mongoose.model<ICategory>('Category').findById(this.parent);
+        const CategoryModel = models.Category || model<ICategory>('Category', CategorySchema);
+        const parentCategory = await CategoryModel.findById(this.parent);
         if (parentCategory) {
           this.ancestors = [
               ...parentCategory.ancestors, 
@@ -89,4 +74,5 @@ CategorySchema.pre<ICategory>('save', async function (next) {
   next();
 });
 
-export default mongoose.models.Category || mongoose.model<ICategory>('Category', CategorySchema);
+// Check if the model is already defined before defining it
+export default models.Category || model<ICategory>('Category', CategorySchema);

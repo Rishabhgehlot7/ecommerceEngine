@@ -1,46 +1,92 @@
 "use client";
 
-import React, { createContext, useContext, ReactNode } from 'react';
-import { useFirebase, useUser as useFirebaseUser } from '@/firebase';
-import {
-  createUserWithEmailAndPassword as firebaseCreateUserWithEmailAndPassword,
-  signInWithEmailAndPassword as firebaseSignInWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  User,
-  UserCredential,
-} from 'firebase/auth';
+import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+
+// This is a mock user type. In a real app, this would be more detailed.
+interface User {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL?: string | null;
+}
 
 interface AuthContextType {
   user: User | null;
   isUserLoading: boolean;
-  createUserWithEmailAndPassword: (email: string, password: string) => Promise<UserCredential>;
-  signInWithEmailAndPassword: (email: string, password: string) => Promise<UserCredential>;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const { auth } = useFirebase();
-  const { user, isUserLoading } = useFirebaseUser();
+const MOCK_USER: User = {
+    uid: 'mock-user-id',
+    email: 'test@example.com',
+    displayName: 'Test User',
+    photoURL: 'https://i.pravatar.cc/150?u=test-user'
+}
 
-  const createUserWithEmailAndPassword = async (email: string, password: string): Promise<UserCredential> => {
-    if (!auth) throw new Error("Firebase auth not available");
-    return firebaseCreateUserWithEmailAndPassword(auth, email, password);
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isUserLoading, setIsUserLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate checking for a logged-in user from a session
+    setTimeout(() => {
+        // To test the logged-out state, set this to null
+        // setUser(MOCK_USER); 
+        setUser(null);
+        setIsUserLoading(false);
+    }, 1000);
+  }, []);
+
+  const login = async (email: string, password: string): Promise<void> => {
+    setIsUserLoading(true);
+    // Simulate API call
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (password === 'password') {
+                const loggedInUser: User = { ...MOCK_USER, email: email, displayName: email.split('@')[0] }
+                setUser(loggedInUser);
+                setIsUserLoading(false);
+                resolve();
+            } else {
+                setIsUserLoading(false);
+                reject(new Error('Invalid email or password'));
+            }
+        }, 1500);
+    });
   };
 
-  const signInWithEmailAndPassword = async (email: string, password: string): Promise<UserCredential> => {
-     if (!auth) throw new Error("Firebase auth not available");
-    return firebaseSignInWithEmailAndPassword(auth, email, password);
-  }
+  const signup = async (firstName: string, lastName: string, email: string, password: string): Promise<void> => {
+     setIsUserLoading(true);
+     // Simulate API call
+     return new Promise((resolve) => {
+         setTimeout(() => {
+            const newUser: User = { 
+                uid: `mock-user-${Date.now()}`,
+                email: email, 
+                displayName: `${firstName} ${lastName}` 
+            };
+            setUser(newUser);
+            setIsUserLoading(false);
+            resolve();
+         }, 1500);
+     });
+  };
 
-  const logout = async () => {
-    if (!auth) throw new Error("Firebase auth not available");
-    await firebaseSignOut(auth);
+  const logout = () => {
+    setIsUserLoading(true);
+    // Simulate API call
+    setTimeout(() => {
+        setUser(null);
+        setIsUserLoading(false);
+    }, 500);
   };
 
   return (
-    <AuthContext.Provider value={{ user, isUserLoading, createUserWithEmailAndPassword, signInWithEmailAndPassword, logout }}>
+    <AuthContext.Provider value={{ user, isUserLoading, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -53,10 +99,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-// No longer need recaptcha verifier in window
-declare global {
-    interface Window {
-        recaptchaVerifier?: any;
-    }
-}

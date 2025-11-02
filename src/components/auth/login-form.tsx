@@ -3,7 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useAuth } from '@/hooks/use-auth';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -21,7 +20,7 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const router = useRouter();
-  const { signInWithEmailAndPassword } = useAuth();
+  const { login } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +32,7 @@ export function LoginForm() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(values.email, values.password);
+      await login(values.email, values.password);
       toast({ title: 'Success', description: 'You are now logged in.' });
       router.push('/');
     } catch (error: any) {

@@ -10,8 +10,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { doc, setDoc } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
 
 const formSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -22,8 +20,7 @@ const formSchema = z.object({
 
 export function SignupForm() {
   const router = useRouter();
-  const { createUserWithEmailAndPassword } = useAuth();
-  const firestore = useFirestore();
+  const { signup } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -33,24 +30,9 @@ export function SignupForm() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!firestore) {
-        toast({ variant: "destructive", title: "Error", description: "Database not available." });
-        return;
-    }
     setLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(values.email, values.password);
-      const user = userCredential.user;
-
-      // Create user profile in Firestore
-      const userRef = doc(firestore, "users", user.uid);
-      await setDoc(userRef, {
-        id: user.uid,
-        firstName: values.firstName,
-        lastName: values.lastName,
-        email: values.email,
-        phoneNumber: '',
-      });
+      await signup(values.firstName, values.lastName, values.email, values.password);
 
       toast({ title: 'Success', description: 'Your account has been created.' });
       router.push('/');

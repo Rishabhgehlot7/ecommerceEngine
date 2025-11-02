@@ -24,18 +24,39 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useState, useEffect } from 'react';
+
+const staticUsers: UserProfile[] = [
+    {
+        id: "1",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john.doe@example.com",
+        phoneNumber: "123-456-7890",
+    },
+    {
+        id: "2",
+        firstName: "Jane",
+        lastName: "Smith",
+        email: "jane.smith@example.com",
+        phoneNumber: "098-765-4321",
+    }
+]
 
 export default function AdminCustomersPage() {
-  const firestore = useFirestore();
-  const usersCollection = useMemoFirebase(
-    () => (firestore ? collection(firestore, 'users') : null),
-    [firestore]
-  );
-  const { data: users, isLoading } = useCollection<UserProfile>(usersCollection);
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate fetching data
+    setTimeout(() => {
+        setUsers(staticUsers);
+        setIsLoading(false);
+    }, 1000);
+  }, []);
+
 
   return (
     <div className="space-y-6">

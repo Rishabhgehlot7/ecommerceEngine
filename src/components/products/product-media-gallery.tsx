@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Card } from '../ui/card';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '../ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProductMediaGalleryProps {
   media: ProductMedia[];
@@ -15,6 +17,19 @@ interface ProductMediaGalleryProps {
 
 export default function ProductMediaGallery({ media, isOnSale }: ProductMediaGalleryProps) {
   const [selectedMedia, setSelectedMedia] = useState(media[0]);
+
+  const currentIndex = media.findIndex((item) => item.url === selectedMedia.url);
+
+  const handlePrevious = () => {
+    const prevIndex = (currentIndex - 1 + media.length) % media.length;
+    setSelectedMedia(media[prevIndex]);
+  };
+
+  const handleNext = () => {
+    const nextIndex = (currentIndex + 1) % media.length;
+    setSelectedMedia(media[nextIndex]);
+  };
+
 
   return (
     <div className="grid gap-4">
@@ -45,6 +60,26 @@ export default function ProductMediaGallery({ media, isOnSale }: ProductMediaGal
                 fill
                 className="object-contain"
               />
+               {media.length > 1 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/50 hover:bg-background/80"
+                  onClick={handlePrevious}
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-background/50 hover:bg-background/80"
+                  onClick={handleNext}
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+              </>
+            )}
            </div>
         </DialogContent>
       </Dialog>

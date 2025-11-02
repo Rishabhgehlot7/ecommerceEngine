@@ -25,15 +25,20 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
-
-const categories = [
-  { id: 'cat1', name: 'Clothing', subcategories: 5, products: 120 },
-  { id: 'cat2', name: 'Electronics', subcategories: 3, products: 75 },
-  { id: 'cat3', name: 'Accessories', subcategories: 8, products: 210 },
-  { id: 'cat4', name: 'Home Goods', subcategories: 4, products: 90 },
-];
+import { categories } from '@/lib/categories';
+import { products } from '@/lib/products';
+import { useMemo } from 'react';
 
 export default function AdminCategoriesPage() {
+  const categoryProductCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    products.forEach(product => {
+      counts.set(product.category, (counts.get(product.category) || 0) + 1);
+    });
+    return counts;
+  }, []);
+
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -71,9 +76,9 @@ export default function AdminCategoriesPage() {
                 <TableRow key={category.id}>
                   <TableCell className="font-medium">{category.name}</TableCell>
                   <TableCell>
-                    <Badge variant="outline">{category.subcategories}</Badge>
+                    <Badge variant="outline">{category.subcategories.length}</Badge>
                   </TableCell>
-                  <TableCell>{category.products}</TableCell>
+                  <TableCell>{categoryProductCounts.get(category.id) || 0}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

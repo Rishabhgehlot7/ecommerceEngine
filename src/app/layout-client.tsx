@@ -1,18 +1,18 @@
+
 'use client';
 
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
+import type { ISettings } from '@/models/Setting';
 
 export default function RootLayoutClient({
   children,
-  logoUrl,
-  storeName,
+  settings,
 }: {
   children: React.ReactNode;
-  logoUrl: string;
-  storeName: string;
+  settings: ISettings;
 }) {
   const pathname = usePathname();
 
@@ -30,9 +30,9 @@ export default function RootLayoutClient({
 
   return (
     <div className="flex min-h-full flex-col">
-      <Header logoUrl={logoUrl} storeName={storeName} />
+      <Header logoUrl={settings.logoUrl} storeName={settings.storeName} />
       <main className="flex-1">{children}</main>
-      <Footer />
+      <Footer settings={settings} />
     </div>
   );
 }

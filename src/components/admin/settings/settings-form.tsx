@@ -73,31 +73,66 @@ export default function SettingsForm({ settings }: { settings: ISettings }) {
             <CardHeader>
               <CardTitle>Store Details</CardTitle>
               <CardDescription>
-                Update your store's name, contact email, and address.
+                Update your store's name, contact information, and social media links.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="storeName">Store Name</Label>
-                <Input id="storeName" name="storeName" defaultValue={settings.storeName} />
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                    <Label htmlFor="storeName">Store Name</Label>
+                    <Input id="storeName" name="storeName" defaultValue={settings.storeName} />
+                </div>
+                <div>
+                    <Label htmlFor="storeAddress">Store Address</Label>
+                    <Textarea
+                    id="storeAddress"
+                    name="storeAddress"
+                    defaultValue={settings.storeAddress}
+                    />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="contactEmail">Contact Email</Label>
-                <Input
-                  id="contactEmail"
-                  name="contactEmail"
-                  type="email"
-                  defaultValue={settings.contactEmail}
-                />
-              </div>
-              <div>
-                <Label htmlFor="storeAddress">Store Address</Label>
-                <Textarea
-                  id="storeAddress"
-                  name="storeAddress"
-                  defaultValue={settings.storeAddress}
-                />
-              </div>
+               <div className="space-y-4 border-t pt-6">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <Label htmlFor="contactEmail">Contact Email</Label>
+                        <Input
+                        id="contactEmail"
+                        name="contactEmail"
+                        type="email"
+                        defaultValue={settings.contactEmail}
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input id="phone" name="phone" defaultValue={settings.phone} />
+                    </div>
+                 </div>
+                 <div>
+                    <Label htmlFor="whatsapp">WhatsApp Number</Label>
+                    <Input id="whatsapp" name="whatsapp" placeholder="+1234567890" defaultValue={settings.whatsapp} />
+                 </div>
+               </div>
+               <div className="space-y-4 border-t pt-6">
+                  <h3 className="text-lg font-medium">Social Media</h3>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div>
+                        <Label htmlFor="socials.facebook">Facebook URL</Label>
+                        <Input id="socials.facebook" name="socials.facebook" defaultValue={settings.socials?.facebook} />
+                    </div>
+                    <div>
+                        <Label htmlFor="socials.instagram">Instagram URL</Label>
+                        <Input id="socials.instagram" name="socials.instagram" defaultValue={settings.socials?.instagram} />
+                    </div>
+                    <div>
+                        <Label htmlFor="socials.twitter">Twitter (X) URL</Label>
+                        <Input id="socials.twitter" name="socials.twitter" defaultValue={settings.socials?.twitter} />
+                    </div>
+                    <div>
+                        <Label htmlFor="socials.youtube">YouTube URL</Label>
+                        <Input id="socials.youtube" name="socials.youtube" defaultValue={settings.socials?.youtube} />
+                    </div>
+                  </div>
+               </div>
             </CardContent>
             <CardFooter className="border-t px-6 py-4">
               <Button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Save Changes'}</Button>
@@ -118,6 +153,7 @@ export default function SettingsForm({ settings }: { settings: ISettings }) {
                 <div>
                   <Label>Logo</Label>
                   <ImageDropzone name="logo" initialImage={settings.logoUrl} />
+                  <Input type="hidden" name="currentLogoUrl" defaultValue={settings.logoUrl} />
                 </div>
                 <div className="space-y-6">
                    <div>

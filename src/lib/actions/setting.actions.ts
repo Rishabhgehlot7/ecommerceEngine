@@ -10,6 +10,14 @@ const defaultSettings = {
     storeName: 'BlueCart',
     contactEmail: 'sales@bluecart.com',
     storeAddress: '123 Market St, San Francisco, CA 94103',
+    phone: '',
+    whatsapp: '',
+    socials: {
+        facebook: '',
+        instagram: '',
+        twitter: '',
+        youtube: '',
+    },
     theme: 'light',
     font: 'inter',
     primaryColor: '#2563eb',
@@ -38,7 +46,13 @@ export async function getSettings(): Promise<ISettings> {
         settings = new Setting(defaultSettings);
         await settings.save();
     }
-    return JSON.parse(JSON.stringify(settings));
+    
+    const plainSettings = JSON.parse(JSON.stringify(settings));
+    // Ensure nested objects exist for easier access on the client
+    if (!plainSettings.socials) {
+        plainSettings.socials = {};
+    }
+    return plainSettings;
 }
 
 export async function updateSettings(formData: FormData) {
@@ -46,6 +60,12 @@ export async function updateSettings(formData: FormData) {
 
     const currentSettings = await getSettings();
     let finalLogoUrl = currentSettings.logoUrl;
+    
+    // Check if the logo is being removed without a new one being uploaded
+    const currentLogoUrlFromForm = formData.get('currentLogoUrl') as string;
+    if (currentLogoUrlFromForm !== finalLogoUrl) { // This means the 'x' was clicked
+        finalLogoUrl = '';
+    }
 
     const imageFile = formData.get('logo') as File | null;
     if (imageFile && imageFile.size > 0) {
@@ -55,10 +75,18 @@ export async function updateSettings(formData: FormData) {
         }
     }
     
-    const updates: Partial<ISettings> = {
+    const updates = {
         storeName: formData.get('storeName') as string,
         contactEmail: formData.get('contactEmail') as string,
         storeAddress: formData.get('storeAddress') as string,
+        phone: formData.get('phone') as string,
+        whatsapp: formData.get('whatsapp') as string,
+        socials: {
+            facebook: formData.get('socials.facebook') as string,
+            instagram: formData.get('socials.instagram') as string,
+            twitter: formData.get('socials.twitter') as string,
+            youtube: formData.get('socials.youtube') as string,
+        },
         theme: formData.get('theme') as 'light' | 'dark' | 'system',
         font: formData.get('font') as string,
         primaryColor: formData.get('primaryColor') as string,
@@ -68,7 +96,7 @@ export async function updateSettings(formData: FormData) {
     const settings = await Setting.findOneAndUpdate({}, updates, { new: true, upsert: true, setDefaultsOnInsert: true });
     
     revalidatePath('/admin/settings');
-    revalidatePath('/'); // Revalidate home page to update header logo
+    revalidatePath('/'); // Revalidate home page to update header/footer
 
     return JSON.parse(JSON.stringify(settings));
 }

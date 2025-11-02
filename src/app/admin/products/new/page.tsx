@@ -25,7 +25,7 @@ import { getAllCategories } from '@/lib/actions/category.actions';
 import type { ICategory } from '@/models/Category';
 import type { IVariant, IDimensions } from '@/models/Product';
 import Image from 'next/image';
-import { UploadCloud, X, Trash2, PlusCircle } from 'lucide-react';
+import { UploadCloud, X, Trash2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { Separator } from '@/components/ui/separator';
 
@@ -185,7 +185,7 @@ export default function NewProductPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <Label htmlFor={`variant-sku-${vIndex}`}>SKU</Label>
-                        <Input id={`variant-sku-${vIndex}`} placeholder="TSHIRT-BLUE-M" value={variant.sku} onChange={(e) => handleVariantChange(vIndex, 'sku', e.target.value)} />
+                        <Input id={`variant-sku-${vIndex}`} placeholder="TSHIRT-BLUE-M" value={variant.sku || ''} onChange={(e) => handleVariantChange(vIndex, 'sku', e.target.value)} />
                     </div>
                     <div>
                         <Label htmlFor={`variant-price-${vIndex}`}>Variant Price</Label>

@@ -51,7 +51,7 @@ const productDetails: ProductData[] = [
     description: 'Your personal AI assistant, ready to play music, answer questions, and control your smart home. Rich, room-filling sound.', 
     price: 89.99, 
     category: 'electronics',
-    mediaIds: ['smart-speaker'],
+    mediaIds: ['smart-speaker', 'smart-speaker-2', 'smart-speaker-3'],
     highlights: [
       'Voice-controlled AI assistant',
       '360-degree sound',
@@ -70,7 +70,7 @@ const productDetails: ProductData[] = [
     description: 'A durable and stylish backpack made from genuine leather. Features multiple compartments and a padded laptop sleeve.', 
     price: 129.99, 
     category: 'fashion',
-    mediaIds: ['leather-backpack'],
+    mediaIds: ['leather-backpack', 'leather-backpack-2', 'leather-backpack-3'],
     highlights: [
         'Genuine full-grain leather',
         'Padded 15" laptop sleeve',
@@ -90,7 +90,7 @@ const productDetails: ProductData[] = [
     price: 79.99, 
     salePrice: 64.99, 
     category: 'home',
-    mediaIds: ['coffee-maker'],
+    mediaIds: ['coffee-maker', 'coffee-maker-2', 'coffee-maker-3'],
      highlights: [
         'Programmable 24-hour timer',
         'Adjustable brew strength',
@@ -109,7 +109,7 @@ const productDetails: ProductData[] = [
     description: 'Support your posture during long work hours with this fully adjustable ergonomic office chair. Breathable mesh back.', 
     price: 399.99, 
     category: 'home',
-    mediaIds: ['ergonomic-chair'],
+    mediaIds: ['ergonomic-chair', 'ergonomic-chair-2', 'ergonomic-chair-3'],
     highlights: [
         'Adjustable lumbar support',
         '4D adjustable armrests',
@@ -129,7 +129,7 @@ const productDetails: ProductData[] = [
     price: 499.99, 
     salePrice: 449.99, 
     category: 'electronics',
-    mediaIds: ['drone-camera'],
+    mediaIds: ['drone-camera', 'drone-camera-2', 'drone-camera-3'],
     highlights: [
         '4K video at 30fps',
         '3-axis gimbal stabilization',
@@ -149,7 +149,7 @@ const productDetails: ProductData[] = [
     description: 'Lightweight and responsive running shoes designed for speed and comfort. Ideal for road running and marathons.', 
     price: 119.99, 
     category: 'fashion',
-    mediaIds: ['running-shoes'],
+    mediaIds: ['running-shoes', 'running-shoes-2', 'running-shoes-3'],
     highlights: [
         'Ultra-lightweight foam sole',
         'Breathable knit upper',

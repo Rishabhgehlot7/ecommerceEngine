@@ -43,10 +43,34 @@
       "imageHint": "smart speaker"
     },
     {
+      "id": "smart-speaker-2",
+      "description": "A person interacting with a smart speaker.",
+      "imageUrl": "https://images.unsplash.com/photo-1535126136211-e88ba49a8570?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "smart home"
+    },
+    {
+      "id": "smart-speaker-3",
+      "description": "A close-up of a smart speaker's mesh texture.",
+      "imageUrl": "https://images.unsplash.com/photo-1543309463-44626242343c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "speaker texture"
+    },
+    {
       "id": "leather-backpack",
       "description": "A brown leather backpack.",
       "imageUrl": "https://images.unsplash.com/photo-1617179918913-f4e099813fb5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsZWF0aGVyJTIwYmFja3BhY2t8ZW58MHx8fHwxNzYxOTgzMDMyfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "leather backpack"
+    },
+    {
+      "id": "leather-backpack-2",
+      "description": "A person wearing the leather backpack in a city.",
+      "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb68c6a62?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "backpack lifestyle"
+    },
+    {
+      "id": "leather-backpack-3",
+      "description": "Detail shot of the backpack's leather and straps.",
+      "imageUrl": "https://images.unsplash.com/photo-1632485140326-3398918a452d?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "backpack detail"
     },
     {
       "id": "coffee-maker",
@@ -55,10 +79,34 @@
       "imageHint": "coffee maker"
     },
     {
+      "id": "coffee-maker-2",
+      "description": "Pouring a cup of coffee from the coffee maker.",
+      "imageUrl": "https://images.unsplash.com/photo-1627910239019-b5c4644b953d?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "coffee pouring"
+    },
+    {
+      "id": "coffee-maker-3",
+      "description": "A kitchen counter with the coffee maker.",
+      "imageUrl": "https://images.unsplash.com/photo-1565452344018-b59a29145b03?q=80&w=1934&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "kitchen scene"
+    },
+    {
       "id": "ergonomic-chair",
       "description": "An ergonomic office chair.",
       "imageUrl": "https://images.unsplash.com/photo-1612372606404-0ab33e7187ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxvZmZpY2UlMjBjaGFpcnxlbnwwfHx8fDE3NjE5MzQxMDF8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "office chair"
+    },
+    {
+      "id": "ergonomic-chair-2",
+      "description": "A person sitting comfortably in the ergonomic chair.",
+      "imageUrl": "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "chair use"
+    },
+    {
+      "id": "ergonomic-chair-3",
+      "description": "Close-up of the chair's lumbar support.",
+      "imageUrl": "https://images.unsplash.com/photo-1551854388-75365319de2eda?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "chair detail"
     },
     {
       "id": "drone-camera",
@@ -67,10 +115,34 @@
       "imageHint": "drone camera"
     },
     {
+      "id": "drone-camera-2",
+      "description": "An aerial shot taken by the drone.",
+      "imageUrl": "https://images.unsplash.com/photo-1505682499293-23953df42a8d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "aerial view"
+    },
+    {
+      "id": "drone-camera-3",
+      "description": "The drone controller in someone's hands.",
+      "imageUrl": "https://images.unsplash.com/photo-1527153924379-b93541a79803?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "drone controller"
+    },
+    {
       "id": "running-shoes",
       "description": "A pair of colorful running shoes.",
       "imageUrl": "https://images.unsplash.com/photo-1469395446868-fb6a048d5ca3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxydW5uaW5nJTIwc2hvZXN8ZW58MHx8fHwxNzYxOTc5MTQ4fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "running shoes"
+    },
+    {
+      "id": "running-shoes-2",
+      "description": "A person tying the laces of the running shoes.",
+      "imageUrl": "https://images.unsplash.com/photo-1511886921442-1262d1a3a3d3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "shoes lifestyle"
+    },
+    {
+      "id": "running-shoes-3",
+      "description": "A close-up shot of the sole of the running shoes.",
+      "imageUrl": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "shoe sole"
     },
     {
       "id": "category-electronics",

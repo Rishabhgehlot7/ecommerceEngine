@@ -41,7 +41,7 @@ async function createSlug(name: string): Promise<string> {
 
 // Pre-save hook to generate slug and ancestors
 CategorySchema.pre<ICategory>('save', async function (next) {
-  if (this.isModified('name')) {
+  if (this.isModified('name') || !this.slug) {
     this.slug = await createSlug.call(this, this.name);
   }
 

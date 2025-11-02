@@ -12,11 +12,15 @@ export default function RootLayoutClient({
 }) {
   const pathname = usePathname();
 
-  const isFullScreenPage = useMemo(() => {
-    return pathname.startsWith('/admin') || pathname === '/login' || pathname === '/signup';
+  const isAuthPage = useMemo(() => {
+    return pathname === '/login' || pathname === '/signup';
   }, [pathname]);
 
-  if (isFullScreenPage) {
+  const isAdminPage = useMemo(() => {
+    return pathname.startsWith('/admin');
+  }, [pathname]);
+
+  if (isAuthPage || isAdminPage) {
     return <>{children}</>;
   }
 

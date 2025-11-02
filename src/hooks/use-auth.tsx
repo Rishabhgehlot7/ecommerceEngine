@@ -25,19 +25,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { user, isUserLoading } = useFirebaseUser();
 
   useEffect(() => {
-    if (auth && !window.recaptchaVerifier) {
+    // Check if the container exists and verifier is not already created.
+    if (auth && !window.recaptchaVerifier && document.getElementById('recaptcha-container')) {
       window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
         'size': 'invisible',
         'callback': (response: any) => {
           // reCAPTCHA solved, allow signInWithPhoneNumber.
         }
       });
+      // Render the verifier
+      window.recaptchaVerifier.render();
     }
+    // We only want to run this when `auth` is available, but not re-run it for other changes.
   }, [auth]);
 
 
   const signInWithPhoneNumber = async (phoneNumber: string): Promise<ConfirmationResult> => {
     if (!auth) throw new Error("Firebase auth not available");
+    // Ensure verifier is ready before sign-in attempt
+    if (!window.recaptchaVerifier) {
+      throw new Error("RecaptchaVerifier not initialized.");
+    }
     const appVerifier = window.recaptchaVerifier;
     return firebaseSignInWithPhoneNumber(auth, phoneNumber, appVerifier);
   };

@@ -36,6 +36,14 @@ export async function addProduct(formData: FormData) {
   const salePrice = formData.get('salePrice') ? parseFloat(formData.get('salePrice') as string) : undefined;
   const categoryId = formData.get('category') as string;
   const images = formData.getAll('images') as File[];
+  
+  const weight = formData.get('weight') ? parseFloat(formData.get('weight') as string) : undefined;
+  const length = formData.get('length') ? parseFloat(formData.get('length') as string) : undefined;
+  const width = formData.get('width') ? parseFloat(formData.get('width') as string) : undefined;
+  const height = formData.get('height') ? parseFloat(formData.get('height') as string) : undefined;
+
+  const variantsData = formData.get('variants') as string;
+  const variants = variantsData ? JSON.parse(variantsData) : [];
 
   if (!name || !description || !price || !categoryId || images.length === 0) {
     throw new Error('Missing required fields');
@@ -44,7 +52,7 @@ export async function addProduct(formData: FormData) {
   const imageUrls = await uploadImages(images);
   const slug = getSlug(name);
   
-  const newProduct = new Product({
+  const newProductData: Partial<IProduct> = {
     name,
     slug,
     description,
@@ -52,7 +60,15 @@ export async function addProduct(formData: FormData) {
     salePrice,
     category: new Types.ObjectId(categoryId),
     media: imageUrls.map(url => ({ type: 'image', url })),
-  });
+    variants,
+    weight,
+  };
+
+  if(length && width && height) {
+    newProductData.dimensions = { length, width, height };
+  }
+
+  const newProduct = new Product(newProductData);
 
   await newProduct.save();
 
@@ -84,6 +100,14 @@ export async function updateProduct(id: string, formData: FormData) {
   const newImages = formData.getAll('images') as File[];
   const existingImageUrls = formData.getAll('existingImages') as string[];
 
+  const weight = formData.get('weight') ? parseFloat(formData.get('weight') as string) : undefined;
+  const length = formData.get('length') ? parseFloat(formData.get('length') as string) : undefined;
+  const width = formData.get('width') ? parseFloat(formData.get('width') as string) : undefined;
+  const height = formData.get('height') ? parseFloat(formData.get('height') as string) : undefined;
+  
+  const variantsData = formData.get('variants') as string;
+  const variants = variantsData ? JSON.parse(variantsData) : [];
+
   const product = await Product.findById(id);
   if (!product) {
       throw new Error('Product not found');
@@ -103,6 +127,15 @@ export async function updateProduct(id: string, formData: FormData) {
   product.salePrice = salePrice;
   product.category = new Types.ObjectId(categoryId);
   product.media = allImageUrls.map(url => ({ type: 'image', url }));
+  product.variants = variants;
+  product.weight = weight;
+  
+  if (length && width && height) {
+      product.dimensions = { length, width, height };
+  } else {
+      product.dimensions = undefined;
+  }
+
 
   await product.save();
 

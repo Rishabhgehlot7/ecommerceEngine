@@ -7,6 +7,19 @@ export interface IProductMedia {
   url: string;
 }
 
+export interface IVariant {
+  sku: string;
+  options: { name: string; value: string }[];
+  price: number;
+  stock: number;
+}
+
+export interface IDimensions {
+    length: number;
+    width: number;
+    height: number;
+}
+
 export interface IProduct extends Document {
   _id: string;
   name: string;
@@ -16,6 +29,9 @@ export interface IProduct extends Document {
   salePrice?: number;
   category: Types.ObjectId | ICategory;
   media: IProductMedia[];
+  variants: IVariant[];
+  dimensions?: IDimensions;
+  weight?: number; // in a standard unit like kg
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -26,6 +42,22 @@ const ProductMediaSchema: Schema = new Schema({
     url: { type: String, required: true },
 });
 
+const VariantSchema: Schema = new Schema({
+    sku: { type: String, required: true, unique: true },
+    options: [{
+        name: { type: String, required: true }, // e.g., 'Color'
+        value: { type: String, required: true } // e.g., 'Blue'
+    }],
+    price: { type: Number, required: true, min: 0 },
+    stock: { type: Number, required: true, default: 0, min: 0 }
+});
+
+const DimensionsSchema: Schema = new Schema({
+    length: { type: Number, required: true, min: 0 },
+    width: { type: Number, required: true, min: 0 },
+    height: { type: Number, required: true, min: 0 }
+});
+
 const ProductSchema: Schema = new Schema({
   name: { type: String, required: true, trim: true },
   slug: { type: String, required: true, unique: true, index: true },
@@ -34,6 +66,9 @@ const ProductSchema: Schema = new Schema({
   salePrice: { type: Number, min: 0 },
   category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
   media: [ProductMediaSchema],
+  variants: [VariantSchema],
+  dimensions: DimensionsSchema,
+  weight: { type: Number, min: 0 }, // Assuming weight in kg
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 

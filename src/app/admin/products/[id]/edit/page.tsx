@@ -9,13 +9,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getProduct, updateProduct } from '@/lib/actions/product.actions';
 import { getAllCategories } from '@/lib/actions/category.actions';
-import type { IProduct } from '@/models/Product';
+import type { IProduct, IVariant } from '@/models/Product';
 import type { ICategory } from '@/models/Category';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { UploadCloud, X } from 'lucide-react';
+import { UploadCloud, X, Trash2 } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 
 export default function EditProductPage({ params }: { params: { id: string } }) {
@@ -27,6 +27,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [variants, setVariants] = useState<Partial<IVariant>[]>([{ sku: '', price: 0, stock: 0, options: [{ name: '', value: ''}] }]);
 
   useEffect(() => {
     async function fetchData() {
@@ -40,6 +41,9 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
           const imageUrls = prod.media.map(m => m.url);
           setExistingImages(imageUrls);
           setPreviews(imageUrls);
+          if (prod.variants && prod.variants.length > 0) {
+            setVariants(prod.variants);
+          }
       }
     }
     fetchData();
@@ -65,7 +69,44 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     }
     setPreviews(prev => prev.filter((_, i) => i !== index));
   };
+  
+  const handleVariantChange = (index: number, field: keyof IVariant, value: any) => {
+    const newVariants = [...variants];
+    (newVariants[index] as any)[field] = value;
+    setVariants(newVariants);
+  };
 
+  const handleVariantOptionChange = (vIndex: number, oIndex: number, field: 'name' | 'value', value: string) => {
+      const newVariants = [...variants];
+      if (newVariants[vIndex].options) {
+        newVariants[vIndex].options![oIndex][field] = value;
+        setVariants(newVariants);
+      }
+  };
+
+  const addVariant = () => {
+      setVariants([...variants, { sku: '', price: 0, stock: 0, options: [{ name: '', value: ''}] }]);
+  };
+  
+  const removeVariant = (index: number) => {
+      setVariants(variants.filter((_, i) => i !== index));
+  };
+  
+  const addVariantOption = (vIndex: number) => {
+    const newVariants = [...variants];
+    if (newVariants[vIndex].options) {
+        newVariants[vIndex].options!.push({ name: '', value: '' });
+        setVariants(newVariants);
+    }
+  };
+
+  const removeVariantOption = (vIndex: number, oIndex: number) => {
+      const newVariants = [...variants];
+      if (newVariants[vIndex].options) {
+        newVariants[vIndex].options = newVariants[vIndex].options!.filter((_, i) => i !== oIndex);
+        setVariants(newVariants);
+      }
+  };
 
   const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -77,6 +118,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     existingImages.forEach(url => formData.append('existingImages', url));
     files.forEach(file => formData.append('images', file));
     
+    formData.append('variants', JSON.stringify(variants.filter(v => v.sku)));
+
     try {
         await updateProduct(params.id, formData);
         router.push('/admin/products');
@@ -128,6 +171,78 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
               </div>
             </CardContent>
           </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Variants</CardTitle>
+              <CardDescription>Add variants like color or size. Each variant can have its own price and stock level.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {variants.map((variant, vIndex) => (
+                <div key={vIndex} className="p-4 border rounded-md space-y-4 relative">
+                  <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 text-destructive" onClick={() => removeVariant(vIndex)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <Label htmlFor={`variant-sku-${vIndex}`}>SKU</Label>
+                        <Input id={`variant-sku-${vIndex}`} placeholder="TSHIRT-BLUE-M" value={variant.sku} onChange={(e) => handleVariantChange(vIndex, 'sku', e.target.value)} />
+                    </div>
+                    <div>
+                        <Label htmlFor={`variant-price-${vIndex}`}>Variant Price</Label>
+                        <Input id={`variant-price-${vIndex}`} type="number" step="0.01" placeholder="21.99" value={variant.price} onChange={(e) => handleVariantChange(vIndex, 'price', parseFloat(e.target.value))} />
+                    </div>
+                    <div>
+                        <Label htmlFor={`variant-stock-${vIndex}`}>Stock</Label>
+                        <Input id={`variant-stock-${vIndex}`} type="number" placeholder="100" value={variant.stock} onChange={(e) => handleVariantChange(vIndex, 'stock', parseInt(e.target.value))} />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Options</Label>
+                    {variant.options?.map((option, oIndex) => (
+                       <div key={oIndex} className="flex items-end gap-2">
+                           <div className="flex-1">
+                               <Input placeholder="e.g. Color" value={option.name} onChange={(e) => handleVariantOptionChange(vIndex, oIndex, 'name', e.target.value)} />
+                           </div>
+                            <div className="flex-1">
+                                <Input placeholder="e.g. Blue" value={option.value} onChange={(e) => handleVariantOptionChange(vIndex, oIndex, 'value', e.target.value)} />
+                           </div>
+                           <Button type="button" variant="outline" size="icon" className="shrink-0" onClick={() => removeVariantOption(vIndex, oIndex)}>
+                               <Trash2 className="h-4 w-4 text-destructive" />
+                           </Button>
+                       </div>
+                    ))}
+                    <Button type="button" variant="outline" size="sm" onClick={() => addVariantOption(vIndex)}>Add Option</Button>
+                  </div>
+                </div>
+              ))}
+              <Button type="button" variant="secondary" onClick={addVariant}>Add Variant</Button>
+            </CardContent>
+          </Card>
+           <Card>
+            <CardHeader>
+              <CardTitle>Shipping</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <Label htmlFor="weight">Weight (kg)</Label>
+                  <Input id="weight" name="weight" type="number" step="0.01" placeholder="0.5" defaultValue={product.weight}/>
+                </div>
+                <div>
+                  <Label htmlFor="length">Length (cm)</Label>
+                  <Input id="length" name="length" type="number" step="0.01" placeholder="30" defaultValue={product.dimensions?.length}/>
+                </div>
+                <div>
+                  <Label htmlFor="width">Width (cm)</Label>
+                  <Input id="width" name="width" type="number" step="0.01" placeholder="20" defaultValue={product.dimensions?.width}/>
+                </div>
+                <div>
+                  <Label htmlFor="height">Height (cm)</Label>
+                  <Input id="height" name="height" type="number" step="0.01" placeholder="5" defaultValue={product.dimensions?.height}/>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
         <div className="space-y-6">
           <Card>
@@ -174,4 +289,3 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     </form>
   );
 }
-

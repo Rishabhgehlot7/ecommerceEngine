@@ -1,20 +1,20 @@
 "use client";
 
-import React, { createContext, useContext, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 import { useFirebase, useUser as useFirebaseUser } from '@/firebase';
 import {
-  signInWithPhoneNumber as firebaseSignInWithPhoneNumber,
-  RecaptchaVerifier,
-  ConfirmationResult,
+  createUserWithEmailAndPassword as firebaseCreateUserWithEmailAndPassword,
+  signInWithEmailAndPassword as firebaseSignInWithEmailAndPassword,
   signOut as firebaseSignOut,
   User,
+  UserCredential,
 } from 'firebase/auth';
 
 interface AuthContextType {
   user: User | null;
   isUserLoading: boolean;
-  signInWithPhoneNumber: (phoneNumber: string) => Promise<ConfirmationResult>;
-  confirmOtp: (confirmationResult: ConfirmationResult, otp: string) => Promise<void>;
+  createUserWithEmailAndPassword: (email: string, password: string) => Promise<UserCredential>;
+  signInWithEmailAndPassword: (email: string, password: string) => Promise<UserCredential>;
   logout: () => void;
 }
 
@@ -24,35 +24,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { auth } = useFirebase();
   const { user, isUserLoading } = useFirebaseUser();
 
-  useEffect(() => {
-    // Check if the container exists and verifier is not already created.
-    if (auth && !window.recaptchaVerifier && document.getElementById('recaptcha-container')) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-        'callback': (response: any) => {
-          // reCAPTCHA solved, allow signInWithPhoneNumber.
-        }
-      });
-      // Render the verifier
-      window.recaptchaVerifier.render();
-    }
-    // We only want to run this when `auth` is available, but not re-run it for other changes.
-  }, [auth]);
-
-
-  const signInWithPhoneNumber = async (phoneNumber: string): Promise<ConfirmationResult> => {
+  const createUserWithEmailAndPassword = async (email: string, password: string): Promise<UserCredential> => {
     if (!auth) throw new Error("Firebase auth not available");
-    // Ensure verifier is ready before sign-in attempt
-    if (!window.recaptchaVerifier) {
-      throw new Error("RecaptchaVerifier not initialized.");
-    }
-    const appVerifier = window.recaptchaVerifier;
-    return firebaseSignInWithPhoneNumber(auth, phoneNumber, appVerifier);
+    return firebaseCreateUserWithEmailAndPassword(auth, email, password);
   };
 
-  const confirmOtp = async (confirmationResult: ConfirmationResult, otp: string) => {
-    await confirmationResult.confirm(otp);
-  };
+  const signInWithEmailAndPassword = async (email: string, password: string): Promise<UserCredential> => {
+     if (!auth) throw new Error("Firebase auth not available");
+    return firebaseSignInWithEmailAndPassword(auth, email, password);
+  }
 
   const logout = async () => {
     if (!auth) throw new Error("Firebase auth not available");
@@ -60,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isUserLoading, signInWithPhoneNumber, confirmOtp, logout }}>
+    <AuthContext.Provider value={{ user, isUserLoading, createUserWithEmailAndPassword, signInWithEmailAndPassword, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -74,8 +54,9 @@ export const useAuth = () => {
   return context;
 };
 
+// No longer need recaptcha verifier in window
 declare global {
     interface Window {
-        recaptchaVerifier: RecaptchaVerifier;
+        recaptchaVerifier?: any;
     }
 }

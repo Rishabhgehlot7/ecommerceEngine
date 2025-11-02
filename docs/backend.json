@@ -101,10 +101,6 @@
           "type": "string",
           "description": "Unique identifier for the user profile."
         },
-        "phoneNumber": {
-          "type": "string",
-          "description": "User's phone number for login."
-        },
         "firstName": {
           "type": "string",
           "description": "User's first name."
@@ -118,6 +114,10 @@
           "description": "User's email address.",
           "format": "email"
         },
+        "password": {
+          "type": "string",
+          "description": "User's password (hashed)."
+        },
         "shippingAddress": {
           "type": "string",
           "description": "User's shipping address."
@@ -129,9 +129,10 @@
       },
       "required": [
         "id",
-        "phoneNumber",
         "firstName",
-        "lastName"
+        "lastName",
+        "email",
+        "password"
       ]
     },
     "Order": {
@@ -216,8 +217,7 @@
   "auth": {
     "providers": [
       "password",
-      "anonymous",
-      "phone"
+      "anonymous"
     ]
   },
   "firestore": {

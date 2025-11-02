@@ -36,10 +36,10 @@ export type Order = {
 
 export type UserProfile = {
   id: string;
-  phoneNumber: string;
   firstName: string;
   lastName: string;
-  email?: string;
+  email: string;
+  phoneNumber?: string;
   shippingAddress?: string;
   billingAddress?: string;
 };

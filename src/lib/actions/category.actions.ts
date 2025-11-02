@@ -35,9 +35,11 @@ export async function addCategory(formData: FormData) {
   }
   
   const imageUrl = await uploadImage(imageFile);
+  const slug = createSlug(name);
 
   const newCategory = new Category({
     name,
+    slug,
     description,
     image: imageUrl,
     parent: parentId,
@@ -50,7 +52,7 @@ export async function addCategory(formData: FormData) {
 
 export async function getAllCategories(): Promise<ICategory[]> {
   await dbConnect();
-  const categories = await Category.find({}).sort({ name: 1 }).populate('parent');
+  const categories = await Category.find({}).sort({ name: 1 });
   return JSON.parse(JSON.stringify(categories));
 }
 
@@ -82,6 +84,7 @@ export async function updateCategory(id: string, formData: FormData) {
   }
 
   category.name = name;
+  category.slug = createSlug(name);
   category.description = description;
   category.image = imageUrl;
   // @ts-ignore

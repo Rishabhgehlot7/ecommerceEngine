@@ -21,6 +21,7 @@ import { Separator } from '@/components/ui/separator';
 
 
 export default function EditProductPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const [product, setProduct] = useState<IProduct | null>(null);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [loading, setLoading] = useState(false);
@@ -59,7 +60,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   useEffect(() => {
     async function fetchData() {
       const [prod, cats] = await Promise.all([
-        getProduct(params.id),
+        getProduct(id),
         getAllCategories()
       ]);
       setProduct(prod);
@@ -82,7 +83,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       }
     }
     fetchData();
-  }, [params.id]);
+  }, [id]);
   
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { 'image/*': [] },
@@ -167,7 +168,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     formData.append('variants', JSON.stringify(variants.filter(v => v.sku)));
 
     try {
-        await updateProduct(params.id, formData);
+        await updateProduct(id, formData);
         router.push('/admin/products');
     } catch (error) {
         console.error('Failed to update product:', error);

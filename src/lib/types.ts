@@ -33,3 +33,35 @@ export type Order = {
   status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Canceled';
   date: string;
 };
+
+export type UserProfile = {
+  id: string;
+  phoneNumber: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  shippingAddress?: string;
+  billingAddress?: string;
+};
+
+export type Review = {
+    id: string;
+    name: string;
+    avatar: string;
+    rating: number;
+    title: string;
+    comment: string;
+};
+
+export type Category = {
+  id: string;
+  name: string;
+  href: string;
+  image: string;
+  imageHint: string;
+  subcategories: {
+    id: string;
+    name: string;
+    href: string;
+  }[];
+};

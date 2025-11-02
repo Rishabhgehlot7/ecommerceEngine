@@ -10,6 +10,8 @@ import { Types } from 'mongoose';
 
 async function uploadImages(files: File[]): Promise<string[]> {
   const uploadPromises = files.map(async (file) => {
+    // Ensure file has content before processing
+    if (file.size === 0) return null;
     const buffer = Buffer.from(await file.arrayBuffer());
     const fileName = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
     try {
@@ -20,7 +22,8 @@ async function uploadImages(files: File[]): Promise<string[]> {
       throw new Error(`Failed to upload image: ${file.name}`);
     }
   });
-  return Promise.all(uploadPromises);
+  const results = await Promise.all(uploadPromises);
+  return results.filter((url): url is string => url !== null);
 }
 
 async function createUniqueSlug(name: string, productIdToExclude: string | null = null): Promise<string> {
@@ -143,7 +146,7 @@ export async function updateProduct(id: string, formData: FormData) {
   }
 
   let uploadedImageUrls: string[] = [];
-  if (newImages.length > 0 && newImages[0].size > 0) {
+  if (newImages.length > 0 && newImages.some(file => file.size > 0)) {
       uploadedImageUrls = await uploadImages(newImages);
   }
   

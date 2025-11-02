@@ -28,6 +28,7 @@ import Link from 'next/link';
 import { getAllCategories } from '@/lib/actions/category.actions';
 import Image from 'next/image';
 import DeleteCategoryButton from '@/components/admin/categories/delete-category-button';
+import { Badge } from '@/components/ui/badge';
 
 export default async function AdminCategoriesPage() {
   const categories = await getAllCategories();
@@ -58,7 +59,7 @@ export default async function AdminCategoriesPage() {
               <TableRow>
                 <TableHead>Image</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
+                <TableHead>Subcategories</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
@@ -71,7 +72,13 @@ export default async function AdminCategoriesPage() {
                     <Image src={category.image} alt={category.name} width={50} height={50} />
                   </TableCell>
                   <TableCell className="font-medium">{category.name}</TableCell>
-                  <TableCell>{category.description}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {category.subcategories?.map((sub: any) => (
+                        <Badge key={sub.slug} variant="secondary">{sub.name}</Badge>
+                      ))}
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

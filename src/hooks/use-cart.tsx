@@ -49,7 +49,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             : item
         );
       }
-      return [...prevItems, { ...product, quantity }];
+      const displayPrice = product.salePrice ?? product.price;
+      return [...prevItems, { ...product, price: displayPrice, quantity }];
     });
     toast({
       title: "Added to cart",

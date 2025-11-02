@@ -1,6 +1,5 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 
@@ -9,13 +8,6 @@ export default function RootLayoutClient({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup');
-
-  if (isAuthPage) {
-    return <>{children}</>;
-  }
-
   return (
     <div className="flex min-h-full flex-col">
       <Header />

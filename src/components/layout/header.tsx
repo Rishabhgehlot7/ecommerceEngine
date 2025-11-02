@@ -5,7 +5,6 @@ import { ShoppingBag, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/hooks/use-cart';
-import { UserNav } from '@/components/auth/user-nav';
 import { CartSheet } from '@/components/cart/cart-sheet';
 
 export default function Header() {
@@ -27,7 +26,9 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-4">
-          <UserNav />
+          <Button asChild>
+            <Link href="#">Login</Link>
+          </Button>
           <CartSheet>
             <Button variant="ghost" size="icon" className="relative">
               <ShoppingBag className="h-6 w-6" />

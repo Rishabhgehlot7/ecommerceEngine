@@ -23,7 +23,7 @@ import { addProduct } from '@/lib/actions/product.actions';
 import { useRouter } from 'next/navigation';
 import { getAllCategories } from '@/lib/actions/category.actions';
 import type { ICategory } from '@/models/Category';
-import type { IVariant } from '@/models/Product';
+import type { IVariant, IDimensions } from '@/models/Product';
 import Image from 'next/image';
 import { UploadCloud, X, Trash2, PlusCircle } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
@@ -65,6 +65,16 @@ export default function NewProductPage() {
   const handleVariantChange = (index: number, field: keyof IVariant, value: any) => {
     const newVariants = [...variants];
     (newVariants[index] as any)[field] = value;
+    setVariants(newVariants);
+  };
+  
+  const handleVariantDimensionChange = (index: number, field: keyof IDimensions, value: string) => {
+    const newVariants = [...variants];
+    const variant = newVariants[index];
+    if (!variant.dimensions) {
+      variant.dimensions = { length: 0, width: 0, height: 0 };
+    }
+    (variant.dimensions as any)[field] = parseFloat(value) || 0;
     setVariants(newVariants);
   };
 
@@ -109,7 +119,7 @@ export default function NewProductPage() {
       formData.append('images', file);
     });
     
-    // Add variants to form data
+    // Add variants to form data, filtering out those without an SKU
     formData.append('variants', JSON.stringify(variants.filter(v => v.sku)));
 
 
@@ -154,7 +164,7 @@ export default function NewProductPage() {
                   <Input id="price" name="price" type="number" step="0.01" placeholder="19.99" required/>
                 </div>
                  <div>
-                  <Label htmlFor="salePrice">Sale Price (Optional)</Label>
+                  <Label htmlFor="salePrice">Sale Price (Discount)</Label>
                   <Input id="salePrice" name="salePrice" type="number" step="0.01" placeholder="14.99" />
                 </div>
               </div>
@@ -163,14 +173,15 @@ export default function NewProductPage() {
           <Card>
             <CardHeader>
               <CardTitle>Variants</CardTitle>
-              <CardDescription>Add variants like color or size. Each variant can have its own price and stock level.</CardDescription>
+              <CardDescription>Add variants like color or size. Each variant can have its own price, stock, and shipping details.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {variants.map((variant, vIndex) => (
-                <div key={vIndex} className="p-4 border rounded-md space-y-4 relative">
+                <div key={vIndex} className="p-4 border rounded-md space-y-4 relative bg-muted/20">
                   <Button type="button" variant="ghost" size="icon" className="absolute top-2 right-2 text-destructive" onClick={() => removeVariant(vIndex)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
+                  
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <Label htmlFor={`variant-sku-${vIndex}`}>SKU</Label>
@@ -178,15 +189,16 @@ export default function NewProductPage() {
                     </div>
                     <div>
                         <Label htmlFor={`variant-price-${vIndex}`}>Variant Price</Label>
-                        <Input id={`variant-price-${vIndex}`} type="number" step="0.01" placeholder="21.99" value={variant.price} onChange={(e) => handleVariantChange(vIndex, 'price', parseFloat(e.target.value))} />
+                        <Input id={`variant-price-${vIndex}`} type="number" step="0.01" placeholder="Overrides main price" value={variant.price || ''} onChange={(e) => handleVariantChange(vIndex, 'price', parseFloat(e.target.value))} />
                     </div>
                     <div>
                         <Label htmlFor={`variant-stock-${vIndex}`}>Stock</Label>
-                        <Input id={`variant-stock-${vIndex}`} type="number" placeholder="100" value={variant.stock} onChange={(e) => handleVariantChange(vIndex, 'stock', parseInt(e.target.value))} />
+                        <Input id={`variant-stock-${vIndex}`} type="number" placeholder="100" value={variant.stock || ''} onChange={(e) => handleVariantChange(vIndex, 'stock', parseInt(e.target.value))} />
                     </div>
                   </div>
+                  
                   <div className="space-y-2">
-                    <Label>Options</Label>
+                    <Label className="text-sm">Options</Label>
                     {variant.options?.map((option, oIndex) => (
                        <div key={oIndex} className="flex items-end gap-2">
                            <div className="flex-1">
@@ -202,6 +214,31 @@ export default function NewProductPage() {
                     ))}
                     <Button type="button" variant="outline" size="sm" onClick={() => addVariantOption(vIndex)}>Add Option</Button>
                   </div>
+                  
+                  <Separator />
+
+                  <div className="space-y-2">
+                    <Label className="text-sm">Variant Shipping Details (Optional)</Label>
+                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                        <Label htmlFor={`variant-weight-${vIndex}`} className="text-xs">Weight (kg)</Label>
+                        <Input id={`variant-weight-${vIndex}`} type="number" step="0.01" placeholder="0.5" value={variant.weight || ''} onChange={(e) => handleVariantChange(vIndex, 'weight', parseFloat(e.target.value))} />
+                        </div>
+                        <div>
+                        <Label htmlFor={`variant-length-${vIndex}`} className="text-xs">Length (cm)</Label>
+                        <Input id={`variant-length-${vIndex}`} type="number" step="0.01" placeholder="30" value={variant.dimensions?.length || ''} onChange={(e) => handleVariantDimensionChange(vIndex, 'length', e.target.value)} />
+                        </div>
+                        <div>
+                        <Label htmlFor={`variant-width-${vIndex}`} className="text-xs">Width (cm)</Label>
+                        <Input id={`variant-width-${vIndex}`} type="number" step="0.01" placeholder="20" value={variant.dimensions?.width || ''} onChange={(e) => handleVariantDimensionChange(vIndex, 'width', e.target.value)} />
+                        </div>
+                        <div>
+                        <Label htmlFor={`variant-height-${vIndex}`} className="text-xs">Height (cm)</Label>
+                        <Input id={`variant-height-${vIndex}`} type="number" step="0.01" placeholder="5" value={variant.dimensions?.height || ''} onChange={(e) => handleVariantDimensionChange(vIndex, 'height', e.target.value)} />
+                        </div>
+                    </div>
+                  </div>
+
                 </div>
               ))}
               <Button type="button" variant="secondary" onClick={addVariant}>Add Variant</Button>
@@ -209,7 +246,8 @@ export default function NewProductPage() {
           </Card>
            <Card>
             <CardHeader>
-              <CardTitle>Shipping</CardTitle>
+              <CardTitle>Default Shipping</CardTitle>
+              <CardDescription>Default shipping details if a variant does not have its own.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

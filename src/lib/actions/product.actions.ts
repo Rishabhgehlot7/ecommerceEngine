@@ -23,9 +23,24 @@ async function uploadImages(files: File[]): Promise<string[]> {
   return Promise.all(uploadPromises);
 }
 
-function getSlug(name: string) {
-    return name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+async function createUniqueSlug(name: string, productIdToExclude: string | null = null): Promise<string> {
+    const baseSlug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    let slug = baseSlug;
+    let count = 1;
+    
+    let query: any = { slug };
+    if (productIdToExclude) {
+        query._id = { $ne: productIdToExclude };
+    }
+
+    while (await Product.findOne(query)) {
+        slug = `${baseSlug}-${count}`;
+        query.slug = slug;
+        count++;
+    }
+    return slug;
 }
+
 
 export async function addProduct(formData: FormData) {
   await dbConnect();
@@ -50,7 +65,7 @@ export async function addProduct(formData: FormData) {
   }
 
   const imageUrls = await uploadImages(images);
-  const slug = getSlug(name);
+  const slug = await createUniqueSlug(name);
   
   const newProductData: Partial<IProduct> = {
     name,
@@ -121,7 +136,11 @@ export async function updateProduct(id: string, formData: FormData) {
   const allImageUrls = [...existingImageUrls, ...uploadedImageUrls];
 
   product.name = name;
-  product.slug = getSlug(name);
+  
+  if (name !== product.name || !product.slug) {
+      product.slug = await createUniqueSlug(name, id);
+  }
+
   product.description = description;
   product.price = price;
   product.salePrice = salePrice;

@@ -7,17 +7,19 @@ export interface IProductMedia {
   url: string;
 }
 
+export interface IDimensions {
+    length: number;
+    width: number;
+    height: number;
+}
+
 export interface IVariant {
   sku: string;
   options: { name: string; value: string }[];
   price: number;
   stock: number;
-}
-
-export interface IDimensions {
-    length: number;
-    width: number;
-    height: number;
+  weight?: number;
+  dimensions?: IDimensions;
 }
 
 export interface IProduct extends Document {
@@ -42,21 +44,23 @@ const ProductMediaSchema: Schema = new Schema({
     url: { type: String, required: true },
 });
 
+const DimensionsSchema: Schema = new Schema({
+    length: { type: Number, required: true, min: 0 },
+    width: { type: Number, required: true, min: 0 },
+    height: { type: Number, required: true, min: 0 }
+}, { _id: false });
+
 const VariantSchema: Schema = new Schema({
-    sku: { type: String, required: true, unique: true },
+    sku: { type: String, required: true, unique: true,sparse: true },
     options: [{
         name: { type: String, required: true }, // e.g., 'Color'
         value: { type: String, required: true } // e.g., 'Blue'
     }],
     price: { type: Number, required: true, min: 0 },
-    stock: { type: Number, required: true, default: 0, min: 0 }
-});
-
-const DimensionsSchema: Schema = new Schema({
-    length: { type: Number, required: true, min: 0 },
-    width: { type: Number, required: true, min: 0 },
-    height: { type: Number, required: true, min: 0 }
-});
+    stock: { type: Number, required: true, default: 0, min: 0 },
+    weight: { type: Number, min: 0 },
+    dimensions: DimensionsSchema,
+}, { _id: false });
 
 const ProductSchema: Schema = new Schema({
   name: { type: String, required: true, trim: true },

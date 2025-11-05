@@ -1,57 +1,41 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
 import ProductCard from '../products/product-card';
-import { orders } from '@/lib/orders';
-import { getProduct } from '@/lib/actions/product.actions';
+import { getProducts } from '@/lib/actions/product.actions';
 import type { IProduct } from '@/models/Product';
 import { Skeleton } from '../ui/skeleton';
 
 export default function BestSellersSection() {
-  const [bestSellers, setBestSellers] = useState<IProduct[]>([]);
+  const [newArrivals, setNewArrivals] = useState<IProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchBestSellers() {
+    async function fetchNewestProducts() {
       try {
-        const productSalesMap = new Map<string, number>();
-        orders.forEach(order => {
-          order.items.forEach(item => {
-            // Assuming item.id is the product ID
-            const productId = item.id; 
-            productSalesMap.set(productId, (productSalesMap.get(productId) || 0) + item.quantity);
-          });
-        });
-
-        const sortedProducts = Array.from(productSalesMap.entries())
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 4)
-          .map(entry => entry[0]);
-
-        const productPromises = sortedProducts.map(id => getProduct(id));
-        const productsData = await Promise.all(productPromises);
-        
-        const validProducts = productsData.filter((p): p is IProduct => p !== null);
-
-        setBestSellers(validProducts);
+        // Fetches all products, sorted by creation date descending by default in the action
+        const allProducts = await getProducts();
+        // Take the first 4
+        setNewArrivals(allProducts.slice(0, 4));
       } catch (error) {
-        console.error("Failed to fetch best sellers", error);
-        setBestSellers([]);
+        console.error("Failed to fetch new arrivals", error);
+        setNewArrivals([]);
       } finally {
         setLoading(false);
       }
     }
     
-    fetchBestSellers();
+    fetchNewestProducts();
   }, []);
 
-  return (
-    <div className="py-12">
-      <div className="mb-8 border-b pb-4">
-        <h2 className="text-4xl font-bold tracking-tight">Our Best Sellers</h2>
-        <p className="mt-2 text-lg text-muted-foreground">Check out the products everyone is raving about.</p>
-      </div>
-       {loading ? (
+  if (loading) {
+    return (
+      <div className="py-12">
+        <div className="mb-8 border-b pb-4">
+          <h2 className="text-4xl font-bold tracking-tight">New Arrivals</h2>
+          <p className="mt-2 text-lg text-muted-foreground">Check out our latest products.</p>
+        </div>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="flex flex-col space-y-3">
@@ -63,13 +47,25 @@ export default function BestSellersSection() {
             </div>
           ))}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {bestSellers.map((product) => (
-            <ProductCard key={product._id} product={product as any} />
-          ))}
-        </div>
-      )}
+      </div>
+    );
+  }
+
+  if (newArrivals.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="py-12">
+      <div className="mb-8 border-b pb-4">
+        <h2 className="text-4xl font-bold tracking-tight">New Arrivals</h2>
+        <p className="mt-2 text-lg text-muted-foreground">Check out our latest products.</p>
+      </div>
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {newArrivals.map((product) => (
+          <ProductCard key={product._id} product={product as any} />
+        ))}
+      </div>
     </div>
   );
 }

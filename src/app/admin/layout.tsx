@@ -1,9 +1,9 @@
+
 'use client';
 
 import {
   SidebarProvider,
   Sidebar,
-  SidebarHeader,
   SidebarContent,
   SidebarMenu,
   SidebarMenuItem,
@@ -19,12 +19,47 @@ import {
   LineChart,
   Tag,
   Settings,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { UserNav } from '@/components/auth/user-nav';
-import { Separator } from '@/components/ui/separator';
+import { useTheme } from "next-themes";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+function ThemeToggle() {
+  const { setTheme } = useTheme();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="icon">
+          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <span className="sr-only">Toggle theme</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setTheme("light")}>
+          Light
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>
+          Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("system")}>
+          System
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export default function AdminLayout({
   children,
@@ -70,15 +105,15 @@ export default function AdminLayout({
     <SidebarProvider>
       <Sidebar collapsible="icon">
         <SidebarContent>
-            <SidebarHeader>
-                <div className="flex items-center gap-2">
-                    <Button asChild variant="ghost" className="p-0 text-lg font-bold">
-                    <Link href="/admin"><span>Admin Panel</span></Link>
-                    </Button>
-                </div>
-            </SidebarHeader>
-             <Separator className="my-2" />
-          <SidebarMenu>
+           <div className="p-2 flex justify-between items-center">
+              <Button asChild variant="ghost" className="p-2 justify-start w-full text-lg font-bold">
+                <Link href="/admin">
+                  <ShoppingCart className="h-6 w-6 mr-2 shrink-0" />
+                  <span className='truncate'>Admin Panel</span>
+                </Link>
+              </Button>
+            </div>
+          <SidebarMenu className='flex-1'>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.label}>
                 <SidebarMenuButton
@@ -98,7 +133,6 @@ export default function AdminLayout({
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-             <Separator className="my-2" />
             <SidebarMenu>
                  <SidebarMenuItem>
                     <SidebarMenuButton
@@ -119,9 +153,10 @@ export default function AdminLayout({
         <header className="flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
           <SidebarTrigger className="sm:hidden" />
           <div className="flex-1" />
+          <ThemeToggle />
           <UserNav />
         </header>
-        <div className="p-4 sm:p-6">{children}</div>
+        <div className="p-4 sm:p-6 bg-muted/40 min-h-[calc(100vh-3.5rem)]">{children}</div>
       </main>
     </SidebarProvider>
   );

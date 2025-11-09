@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import Link from 'next/link';
-import { User, LogOut, ShoppingBasket, Home } from 'lucide-react';
+import { User, LogOut, ShoppingBasket, LayoutDashboard } from 'lucide-react';
 import { Skeleton } from "../ui/skeleton";
 
 export function UserNav() {
@@ -55,8 +55,8 @@ export function UserNav() {
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link href="/admin">
-                <Home className="mr-2 h-4 w-4" />
-                <span>Admin</span>
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <span>Dashboard</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem disabled>

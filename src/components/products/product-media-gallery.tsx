@@ -1,22 +1,40 @@
+
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import type { ProductMedia } from '@/lib/types';
+import type { IProductMedia } from '@/models/Product';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Card } from '../ui/card';
-import { Dialog, DialogContent, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '../ui/button';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProductMediaGalleryProps {
-  media: ProductMedia[];
+  media: IProductMedia[];
+  alt: string;
   isOnSale: boolean;
 }
 
-export default function ProductMediaGallery({ media, isOnSale }: ProductMediaGalleryProps) {
+export default function ProductMediaGallery({ media, alt, isOnSale }: ProductMediaGalleryProps) {
   const [selectedMedia, setSelectedMedia] = useState(media[0]);
+
+  useEffect(() => {
+    setSelectedMedia(media[0]);
+  }, [media]);
+
+  if (!media || media.length === 0) {
+      return (
+          <div className="grid gap-4">
+               <Card className="overflow-hidden">
+                <div className="relative aspect-square bg-muted flex items-center justify-center">
+                    <p className="text-muted-foreground">No Image</p>
+                </div>
+              </Card>
+          </div>
+      )
+  }
 
   const currentIndex = media.findIndex((item) => item.url === selectedMedia.url);
 
@@ -42,11 +60,10 @@ export default function ProductMediaGallery({ media, isOnSale }: ProductMediaGal
               )}
               <Image
                 src={selectedMedia.url}
-                alt={selectedMedia.alt}
+                alt={alt}
                 width={800}
                 height={800}
                 className="h-full w-full object-cover transition-opacity duration-300"
-                data-ai-hint={selectedMedia.imageHint}
                 priority
               />
             </div>
@@ -56,7 +73,7 @@ export default function ProductMediaGallery({ media, isOnSale }: ProductMediaGal
            <div className="relative aspect-square">
             <Image
                 src={selectedMedia.url}
-                alt={selectedMedia.alt}
+                alt={alt}
                 fill
                 className="object-contain"
               />
@@ -81,7 +98,6 @@ export default function ProductMediaGallery({ media, isOnSale }: ProductMediaGal
               </>
             )}
            </div>
-           {/* The default close button is part of DialogContent, but we can add an explicit one if needed for styling. */}
         </DialogContent>
       </Dialog>
       
@@ -98,7 +114,7 @@ export default function ProductMediaGallery({ media, isOnSale }: ProductMediaGal
             >
               <Image
                 src={item.url}
-                alt={item.alt}
+                alt={`${alt} - thumbnail ${index + 1}`}
                 width={150}
                 height={150}
                 className="aspect-square h-full w-full object-cover"

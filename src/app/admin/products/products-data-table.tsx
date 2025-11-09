@@ -34,6 +34,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -71,7 +72,9 @@ export default function ProductsDataTable<TData, TValue>({
   })
 
   return (
-     <div>
+     <Card>
+        <CardContent className="pt-6">
+
         <div className="flex items-center py-4">
             <Input
             placeholder="Filter products by name..."
@@ -176,6 +179,7 @@ export default function ProductsDataTable<TData, TValue>({
             Next
             </Button>
         </div>
-    </div>
+        </CardContent>
+    </Card>
   )
 }

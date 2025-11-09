@@ -59,20 +59,23 @@ export async function updateSettings(formData: FormData) {
     await dbConnect();
 
     const currentSettings = await getSettings();
-    let finalLogoUrl = currentSettings.logoUrl;
-    
-    // Check if the logo is being removed without a new one being uploaded
-    const currentLogoUrlFromForm = formData.get('currentLogoUrl') as string;
-    if (currentLogoUrlFromForm !== finalLogoUrl) { // This means the 'x' was clicked
-        finalLogoUrl = '';
-    }
+    let finalLogoUrl = currentSettings.logoUrl || '';
 
     const imageFile = formData.get('logo') as File | null;
+    const currentLogoUrlFromForm = formData.get('currentImage');
+    
+    // If there's an image file, it means a new one was uploaded or an existing one was replaced.
     if (imageFile && imageFile.size > 0) {
         const uploadedUrl = await uploadImage(imageFile);
         if (uploadedUrl) {
             finalLogoUrl = uploadedUrl;
         }
+    } else if (currentLogoUrlFromForm === null) {
+        // If there's no image file AND the currentImage field is not present, it means the image was removed.
+        finalLogoUrl = '';
+    } else {
+        // If no new file and currentImage exists, keep the existing logo.
+        finalLogoUrl = currentLogoUrlFromForm as string;
     }
     
     const updates = {
@@ -95,8 +98,8 @@ export async function updateSettings(formData: FormData) {
 
     const settings = await Setting.findOneAndUpdate({}, updates, { new: true, upsert: true, setDefaultsOnInsert: true });
     
-    revalidatePath('/admin/settings');
-    revalidatePath('/'); // Revalidate home page to update header/footer
+    revalidatePath('/admin/settings', 'layout');
+    revalidatePath('/', 'layout');
 
     return JSON.parse(JSON.stringify(settings));
 }

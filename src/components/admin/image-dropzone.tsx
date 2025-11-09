@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useCallback } from 'react';
@@ -14,15 +15,24 @@ interface ImageDropzoneProps {
 
 export default function ImageDropzone({ name, initialImage }: ImageDropzoneProps) {
   const [preview, setPreview] = useState<string | null>(initialImage || null);
-  const [file, setFile] = useState<File | null>(null);
+  // We use this to track if the image has been removed by the user
+  const [isRemoved, setIsRemoved] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles && acceptedFiles.length > 0) {
       const selectedFile = acceptedFiles[0];
-      setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
+      setIsRemoved(false);
+      
+      // We need a way to pass the file to the form data. A hidden input is a good way.
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(selectedFile);
+      const fileInput = document.getElementById(`${name}-file-input`) as HTMLInputElement;
+      if (fileInput) {
+          fileInput.files = dataTransfer.files;
+      }
     }
-  }, []);
+  }, [name]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -32,9 +42,14 @@ export default function ImageDropzone({ name, initialImage }: ImageDropzoneProps
     multiple: false,
   });
   
-  const handleRemoveImage = () => {
+  const handleRemoveImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setPreview(null);
-    setFile(null);
+    setIsRemoved(true);
+    const fileInput = document.getElementById(`${name}-file-input`) as HTMLInputElement;
+    if (fileInput) {
+        fileInput.value = ""; // Clear the file input
+    }
   };
 
   return (
@@ -46,7 +61,9 @@ export default function ImageDropzone({ name, initialImage }: ImageDropzoneProps
           isDragActive && 'border-primary bg-primary/10'
         )}
       >
-        <Input {...getInputProps()} />
+        {/* The actual file input is always part of the DOM for form submission */}
+        <input {...getInputProps()} id={`${name}-file-input`} name={name} />
+
         {preview ? (
           <>
             <Image
@@ -58,10 +75,7 @@ export default function ImageDropzone({ name, initialImage }: ImageDropzoneProps
             />
             <button
               type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleRemoveImage();
-              }}
+              onClick={handleRemoveImage}
               className="absolute right-2 top-2 rounded-full bg-background/80 p-1 text-destructive backdrop-blur-sm"
             >
               <X className="h-4 w-4" />
@@ -74,14 +88,10 @@ export default function ImageDropzone({ name, initialImage }: ImageDropzoneProps
           </div>
         )}
       </div>
-      {/* Hidden input to carry the file to the form data */}
-      {file && <input type="file" name={name} style={{ display: 'none' }} files={new DataTransfer().files} ref={input => {
-          if (input) {
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            input.files = dataTransfer.files;
-          }
-      }}/>}
+      {/* Hidden input to track the state of the initial image */}
+      {!preview && !isRemoved && initialImage && (
+        <input type="hidden" name="currentImage" value={initialImage} />
+      )}
     </div>
   );
 }

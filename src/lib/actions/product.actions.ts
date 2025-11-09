@@ -105,10 +105,13 @@ export async function addProduct(formData: FormData) {
 
   revalidatePath('/admin/products');
   revalidatePath('/');
+  revalidatePath('/shop');
 }
 
 export async function getProducts(): Promise<IProduct[]> {
     await dbConnect();
+    // Eagerly import Category model to prevent MissingSchemaError
+    await Category.find({});
     const products = await Product.find({}).populate('category').sort({ createdAt: -1 });
     return JSON.parse(JSON.stringify(products));
 }
@@ -118,6 +121,13 @@ export async function getProduct(id: string): Promise<IProduct | null> {
     await dbConnect();
     const product = await Product.findById(id).populate('category');
     return JSON.parse(JSON.stringify(product));
+}
+
+export async function getProductBySlug(slug: string): Promise<IProduct | null> {
+  await dbConnect();
+  await Category.find({}); // Ensure category schema is registered
+  const product = await Product.findOne({ slug }).populate('category');
+  return JSON.parse(JSON.stringify(product));
 }
 
 export async function updateProduct(id: string, formData: FormData) {
@@ -178,6 +188,7 @@ export async function updateProduct(id: string, formData: FormData) {
   revalidatePath('/admin/products');
   revalidatePath(`/admin/products/${id}/edit`);
   revalidatePath(`/products/${product.slug}`);
+  revalidatePath('/shop');
 }
 
 
@@ -187,4 +198,5 @@ export async function deleteProduct(id: string) {
   await Product.findByIdAndDelete(id);
 
   revalidatePath('/admin/products');
+  revalidatePath('/shop');
 }

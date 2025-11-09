@@ -3,7 +3,6 @@
 import {
   SidebarProvider,
   Sidebar,
-  SidebarHeader,
   SidebarContent,
   SidebarMenu,
   SidebarMenuItem,
@@ -24,7 +23,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { UserNav } from '@/components/auth/user-nav';
-import { Separator } from '@/components/ui/separator';
 
 export default function AdminLayout({
   children,
@@ -70,14 +68,14 @@ export default function AdminLayout({
     <SidebarProvider>
       <Sidebar collapsible="icon">
         <SidebarContent>
-            <SidebarHeader>
-                <div className="flex items-center gap-2">
-                    <Button asChild variant="ghost" className="p-0 text-lg font-bold">
-                    <Link href="/admin"><span>Admin Panel</span></Link>
-                    </Button>
-                </div>
-            </SidebarHeader>
-             <Separator className="my-2" />
+          <div className="p-2">
+            <Button asChild variant="ghost" className="p-2 justify-start w-full text-lg font-bold">
+              <Link href="/admin">
+                <ShoppingCart className="h-6 w-6 mr-2" />
+                <span>Admin Panel</span>
+              </Link>
+            </Button>
+          </div>
           <SidebarMenu>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.label}>
@@ -98,7 +96,6 @@ export default function AdminLayout({
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-             <Separator className="my-2" />
             <SidebarMenu>
                  <SidebarMenuItem>
                     <SidebarMenuButton

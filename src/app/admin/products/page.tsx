@@ -1,11 +1,3 @@
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { PlusCircle } from 'lucide-react';
@@ -29,17 +21,7 @@ export default async function AdminProductsPage() {
           </Link>
         </Button>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Product List</CardTitle>
-          <CardDescription>
-            A list of all products in your store.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ProductsDataTable columns={columns} data={products} />
-        </CardContent>
-      </Card>
+      <ProductsDataTable columns={columns} data={products} />
     </div>
   );
 }

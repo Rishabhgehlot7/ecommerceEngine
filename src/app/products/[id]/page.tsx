@@ -1,4 +1,5 @@
-import { getProduct } from '@/lib/actions/product.actions';
+
+import { getProductBySlug, getProducts } from '@/lib/actions/product.actions';
 import { notFound } from 'next/navigation';
 import ProductRecommendations from '@/components/products/product-recommendations';
 import AddToCartButton from '@/components/products/add-to-cart-button';
@@ -8,8 +9,18 @@ import BuyNowButton from '@/components/products/buy-now-button';
 import ProductMediaGallery from '@/components/products/product-media-gallery';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Star, CheckCircle } from 'lucide-react';
-import type { IProduct } from '@/models/Product';
+import { Star } from 'lucide-react';
+import type { IProduct, IVariant } from '@/models/Product';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import VariantSelector from '@/components/products/variant-selector';
+
 // Mock reviews as the static file was removed.
 const reviews = [
     {id: '1', rating: 5, name: 'Customer', title: 'Great!', comment: 'Wonderful product.'},
@@ -24,16 +35,16 @@ interface ProductPageProps {
 }
 
 
-// export async function generateStaticParams() {
-//   const products = await getProducts();
-//   return products.map(product => ({
-//       id: product.slug,
-//   }));
-// }
+export async function generateStaticParams() {
+  const products = await getProducts();
+  return products.map(product => ({
+      id: product.slug,
+  }));
+}
 
 export default async function ProductPage({ params }: ProductPageProps) {
   // The param is named `id` due to the folder structure `[id]`, but it's the slug.
-  const product = {} as IProduct; // await getProductBySlug(params.id);
+  const product = await getProductBySlug(params.id);
 
   if (!product) {
     notFound();
@@ -57,11 +68,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
       <div className="grid gap-8 md:grid-cols-2 lg:gap-16">
-        <ProductMediaGallery media={product.media || []} isOnSale={!!isOnSale} />
+        <ProductMediaGallery media={product.media || []} isOnSale={!!isOnSale} alt={product.name}/>
 
-        <div className="flex flex-col justify-center">
+        <div className="flex flex-col">
           <h1 className="text-4xl font-bold">{product.name}</h1>
-          <div className="mt-6 flex items-baseline gap-4">
+          <div className="mt-4 flex items-baseline gap-4">
              <p className={`font-headline text-4xl font-bold ${isOnSale ? 'text-destructive' : 'text-primary'}`}>
                 {formatPrice(isOnSale ? product.salePrice! : product.price)}
             </p>
@@ -71,44 +82,25 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </p>
             )}
           </div>
-           {/* This part needs to be adapted if highlights are not in your model */}
-           {/* <ul className="mt-6 space-y-2 text-muted-foreground">
-                {product.highlights.map((highlight, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                        <CheckCircle className="h-5 w-5 text-primary" />
-                        <span>{highlight}</span>
-                    </li>
-                ))}
-             </ul> */}
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <AddToCartButton product={productForButtons} />
-            <BuyNowButton product={productForButtons} />
-            <WishlistButton product={productForButtons} />
+          <div className="mt-6 prose text-muted-foreground max-w-none">
+            <p>{product.description}</p>
           </div>
+           
+          <VariantSelector product={productForButtons as any} />
+
         </div>
       </div>
        <div className="mt-16">
         <Tabs defaultValue="description">
-          <TabsList className="grid w-full grid-cols-3 md:w-auto md:inline-flex">
-            <TabsTrigger value="description">Description</TabsTrigger>
-            <TabsTrigger value="specifications">Specifications</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 md:w-auto md:inline-flex">
+            <TabsTrigger value="description">Full Description</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
           </TabsList>
           <TabsContent value="description" className="mt-6">
             <Card>
-                <CardContent className="p-6 text-muted-foreground">
+                <CardContent className="p-6 text-muted-foreground prose max-w-none">
                     <p>{product.description}</p>
-                </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="specifications" className="mt-6">
-             <Card>
-                <CardHeader>
-                    <CardTitle>Technical Specifications</CardTitle>
-                </CardHeader>
-                <CardContent>
-                   {/* This part needs to be adapted for your variant structure */}
-                   <p className="text-muted-foreground">No specifications available.</p>
+                    {/* Add more detailed description if available */}
                 </CardContent>
             </Card>
           </TabsContent>

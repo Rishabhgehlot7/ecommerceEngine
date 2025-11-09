@@ -73,13 +73,13 @@ export async function addCategory(formData: FormData) {
 
 export async function getAllCategories(): Promise<ICategory[]> {
   await dbConnect();
-  const categories = await Category.find({}).sort({ name: 1 }).populate('parent');
+  const categories = await Category.find({}).sort({ name: 1 }).populate('parent').lean();
   return JSON.parse(JSON.stringify(categories));
 }
 
 export async function getCategory(id: string): Promise<ICategory | null> {
   await dbConnect();
-  const category = await Category.findById(id).populate('parent');
+  const category = await Category.findById(id).populate('parent').lean();
   if (!category) {
       return null;
   }

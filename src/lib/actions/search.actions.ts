@@ -26,11 +26,11 @@ export async function search(query: string): Promise<SearchResults> {
       { description: searchRegex },
       { 'variants.sku': searchRegex },
     ],
-  }).populate('category').limit(10).exec();
+  }).populate('category').limit(10).lean().exec();
 
   const categoriesPromise = Category.find({
     $or: [{ name: searchRegex }, { description: searchRegex }],
-  }).limit(5).exec();
+  }).limit(5).lean().exec();
 
   const [products, categories] = await Promise.all([
     productsPromise,

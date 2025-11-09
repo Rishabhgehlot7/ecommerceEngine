@@ -75,6 +75,6 @@ export async function login(data: unknown) {
 
 export async function getUsers(): Promise<IUser[]> {
     await dbConnect();
-    const users = await User.find({}).sort({ createdAt: -1 });
+    const users = await User.find({}).sort({ createdAt: -1 }).lean();
     return JSON.parse(JSON.stringify(users));
 }

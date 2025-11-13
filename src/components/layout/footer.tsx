@@ -2,8 +2,10 @@
 'use client';
 
 import type { ISettings } from '@/models/Setting';
-import { Facebook, Instagram, Twitter, Youtube, Phone, Mail } from 'lucide-react';
+import type { ICategory } from '@/models/Category';
+import { Facebook, Instagram, Twitter, Youtube, Phone, Mail, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Simple SVG for WhatsApp
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -22,7 +24,7 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 
-export default function Footer({ settings }: { settings: ISettings }) {
+export default function Footer({ settings, categories }: { settings: ISettings, categories: ICategory[] }) {
     const hasSocials = settings.socials && Object.values(settings.socials).some(link => !!link);
     
     const socialLinks = [
@@ -44,14 +46,22 @@ export default function Footer({ settings }: { settings: ISettings }) {
         ]
     }
 
+    const topLevelCategories = categories.filter(c => !c.parent).slice(0, 5);
+
 
   return (
     <footer className="border-t bg-card">
-      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
             <div className="col-span-2 md:col-span-1">
-                <h4 className="text-lg font-semibold">{settings.storeName}</h4>
-                <p className="mt-2 text-sm text-muted-foreground">© {new Date().getFullYear()} All rights reserved.</p>
+                <Link href="/" className="flex items-center gap-2">
+                    {settings.logoUrl ? (
+                        <Image src={settings.logoUrl} alt={settings.storeName} width={120} height={40} className="h-10 w-auto" />
+                    ) : (
+                        <span className="font-headline text-2xl font-bold">{settings.storeName}</span>
+                    )}
+                </Link>
+                <p className="mt-4 text-sm text-muted-foreground">© {new Date().getFullYear()} All rights reserved.</p>
                  {hasSocials && (
                      <div className="mt-4 flex gap-4">
                         {socialLinks.map(social => social.href && (
@@ -66,8 +76,8 @@ export default function Footer({ settings }: { settings: ISettings }) {
             
             {Object.entries(footerLinks).map(([title, links]) => (
                  <div key={title}>
-                    <h4 className="text-lg font-semibold">{title}</h4>
-                    <ul className="mt-2 space-y-2 text-sm">
+                    <h4 className="font-semibold">{title}</h4>
+                    <ul className="mt-4 space-y-3 text-sm">
                         {links.map(link => (
                             <li key={link.name}>
                                 <Link href={link.href} className="text-muted-foreground hover:text-primary">
@@ -78,10 +88,26 @@ export default function Footer({ settings }: { settings: ISettings }) {
                     </ul>
                 </div>
             ))}
-            
              <div>
-                <h4 className="text-lg font-semibold">Contact Us</h4>
-                <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
+                <h4 className="font-semibold">Categories</h4>
+                <ul className="mt-4 space-y-3 text-sm">
+                    {topLevelCategories.map(cat => (
+                        <li key={cat._id}>
+                            <Link href={`/category/${cat.slug}`} className="text-muted-foreground hover:text-primary">
+                                {cat.name}
+                            </Link>
+                        </li>
+                    ))}
+                     <li>
+                        <Link href="/shop" className="font-medium text-primary hover:underline">
+                            View All
+                        </Link>
+                    </li>
+                </ul>
+            </div>
+             <div>
+                <h4 className="font-semibold">Contact Us</h4>
+                <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
                     {settings.phone && (
                         <li>
                             <a href={`tel:${settings.phone}`} className="inline-flex items-center gap-2 hover:text-primary">

@@ -6,13 +6,16 @@ import Footer from '@/components/layout/footer';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 import type { ISettings } from '@/models/Setting';
+import type { ICategory } from '@/models/Category';
 
 export default function RootLayoutClient({
   children,
   settings,
+  categories,
 }: {
   children: React.ReactNode;
   settings: ISettings;
+  categories: ICategory[];
 }) {
   const pathname = usePathname();
 
@@ -32,7 +35,7 @@ export default function RootLayoutClient({
     <div className="flex min-h-full flex-col">
       <Header logoUrl={settings.logoUrl} storeName={settings.storeName} />
       <main className="flex-1">{children}</main>
-      <Footer settings={settings} />
+      <Footer settings={settings} categories={categories} />
     </div>
   );
 }

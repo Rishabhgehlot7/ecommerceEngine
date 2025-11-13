@@ -9,15 +9,13 @@ import { useCart } from '@/hooks/use-cart';
 import { CartSheet } from '@/components/cart/cart-sheet';
 import { UserNav } from '../auth/user-nav';
 import { useWishlist } from '@/hooks/use-wishlist';
+import { useSettings } from '@/hooks/use-settings';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
-interface HeaderProps {
-    logoUrl?: string | null;
-    storeName?: string | null;
-}
-
-export default function Header({ logoUrl, storeName }: HeaderProps) {
+export default function Header() {
+  const { settings } = useSettings();
+  const { logoUrl, storeName } = settings;
   const { totalItems: totalCartItems } = useCart();
   const { totalItems: totalWishlistItems } = useWishlist();
   const router = useRouter();

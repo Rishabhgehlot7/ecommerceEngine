@@ -2,30 +2,14 @@
 import { getProductBySlug, getProducts } from '@/lib/actions/product.actions';
 import { notFound } from 'next/navigation';
 import ProductRecommendations from '@/components/products/product-recommendations';
-import AddToCartButton from '@/components/products/add-to-cart-button';
-import WishlistButton from '@/components/products/wishlist-button';
-import { Badge } from '@/components/ui/badge';
-import BuyNowButton from '@/components/products/buy-now-button';
-import ProductMediaGallery from '@/components/products/product-media-gallery';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Star } from 'lucide-react';
-import type { IProduct, IVariant } from '@/models/Product';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Card, CardContent } from '@/components/ui/card';
+import type { IProduct } from '@/models/Product';
 import VariantSelector from '@/components/products/variant-selector';
-
-// Mock reviews as the static file was removed.
-const reviews = [
-    {id: '1', rating: 5, name: 'Customer', title: 'Great!', comment: 'Wonderful product.'},
-    {id: '2', rating: 4, name: 'Another Customer', title: 'Good', comment: 'Pretty good.'}
-]
+import ProductMediaGallery from '@/components/products/product-media-gallery';
+import { getReviewsForProduct } from '@/lib/actions/review.actions';
+import ProductReviews from '@/components/products/product-reviews';
+import { Star } from 'lucide-react';
 
 interface ProductPageProps {
   params: {
@@ -49,6 +33,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product) {
     notFound();
   }
+  
+  const reviews = await getReviewsForProduct(product._id);
+
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -72,6 +59,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         <div className="flex flex-col">
           <h1 className="text-4xl font-bold">{product.name}</h1>
+           <div className="mt-4 flex items-center gap-2">
+            <div className="flex items-center">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className={`h-5 w-5 ${i < Math.round(product.averageRating) ? 'text-primary fill-primary' : 'text-muted-foreground/50'}`} />
+              ))}
+            </div>
+            <span className="text-muted-foreground">({product.numReviews} reviews)</span>
+          </div>
           <div className="mt-4 flex items-baseline gap-4">
              <p className={`font-headline text-4xl font-bold ${isOnSale ? 'text-destructive' : 'text-primary'}`}>
                 {formatPrice(isOnSale ? product.salePrice! : product.price)}
@@ -91,7 +86,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </div>
       </div>
        <div className="mt-16">
-        <Tabs defaultValue="description">
+        <Tabs defaultValue="reviews">
           <TabsList className="grid w-full grid-cols-2 md:w-auto md:inline-flex">
             <TabsTrigger value="description">Full Description</TabsTrigger>
             <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
@@ -105,27 +100,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </Card>
           </TabsContent>
           <TabsContent value="reviews" className="mt-6">
-             <Card>
-                 <CardHeader>
-                    <CardTitle>Customer Reviews</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    {reviews.slice(0,2).map((review) => (
-                        <div key={review.id}>
-                            <div className="flex items-center gap-2">
-                                <p className="font-semibold">{review.name}</p>
-                                <div className="flex items-center">
-                                    {[...Array(5)].map((_, i) => (
-                                        <Star key={i} className={`h-4 w-4 ${i < review.rating ? 'text-primary fill-primary' : 'text-muted-foreground'}`}/>
-                                    ))}
-                                </div>
-                            </div>
-                            <h4 className="mt-1 font-medium">{review.title}</h4>
-                            <p className="mt-1 text-muted-foreground">{review.comment}</p>
-                        </div>
-                    ))}
-                </CardContent>
-             </Card>
+             <ProductReviews productId={product._id} initialReviews={reviews} />
           </TabsContent>
         </Tabs>
       </div>

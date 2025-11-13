@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -10,6 +11,7 @@ import { getSettings } from '@/lib/actions/setting.actions';
 import { getAllCategories } from '@/lib/actions/category.actions';
 import { ThemeProvider } from '@/components/theme-provider';
 import Script from 'next/script';
+import { hexToHsl } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'BlueCart',
@@ -23,6 +25,7 @@ export default async function RootLayout({
 }>) {
   const settings = await getSettings();
   const categories = await getAllCategories();
+  const primaryColorHsl = hexToHsl(settings.primaryColor);
 
   return (
     <html lang="en" className={cn("h-full")} suppressHydrationWarning>
@@ -32,7 +35,7 @@ export default async function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@500;700&display=swap" rel="stylesheet" />
         <style id="theme-variables" dangerouslySetInnerHTML={{__html: `
           :root { 
-            --primary-hsl: ${settings.primaryColor};
+            --primary: ${primaryColorHsl};
             --font-body: 'Inter', sans-serif;
             --font-headline: 'Poppins', sans-serif;
           }
@@ -41,7 +44,7 @@ export default async function RootLayout({
       <body className={cn('h-full font-body antialiased')}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme={settings.theme}
           enableSystem
         >
           <AuthProvider>

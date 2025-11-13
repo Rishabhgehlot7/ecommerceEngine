@@ -31,18 +31,57 @@ export default function Footer({ settings }: { settings: ISettings }) {
         { name: 'Twitter', href: settings.socials?.twitter, icon: Twitter },
         { name: 'YouTube', href: settings.socials?.youtube, icon: Youtube },
     ];
+    
+    const footerLinks = {
+        'Company': [
+            { name: 'About Us', href: '/about' },
+            { name: 'Contact Us', href: '/contact' },
+        ],
+        'Policies': [
+            { name: 'Privacy Policy', href: '/privacy-policy' },
+            { name: 'Terms & Conditions', href: '/terms-conditions' },
+            { name: 'Refund & Return Policy', href: '/refund-policy' },
+        ]
+    }
+
 
   return (
     <footer className="border-t bg-card">
       <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 text-center md:grid-cols-3 md:text-left">
-            <div>
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
+            <div className="col-span-2 md:col-span-1">
                 <h4 className="text-lg font-semibold">{settings.storeName}</h4>
                 <p className="mt-2 text-sm text-muted-foreground">© {new Date().getFullYear()} All rights reserved.</p>
+                 {hasSocials && (
+                     <div className="mt-4 flex gap-4">
+                        {socialLinks.map(social => social.href && (
+                            <Link key={social.name} href={social.href} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+                                <social.icon className="h-6 w-6" />
+                                <span className="sr-only">{social.name}</span>
+                            </Link>
+                        ))}
+                    </div>
+                )}
             </div>
+            
+            {Object.entries(footerLinks).map(([title, links]) => (
+                 <div key={title}>
+                    <h4 className="text-lg font-semibold">{title}</h4>
+                    <ul className="mt-2 space-y-2 text-sm">
+                        {links.map(link => (
+                            <li key={link.name}>
+                                <Link href={link.href} className="text-muted-foreground hover:text-primary">
+                                    {link.name}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ))}
+            
              <div>
                 <h4 className="text-lg font-semibold">Contact Us</h4>
-                <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                <ul className="mt-2 space-y-2 text-sm text-muted-foreground">
                     {settings.phone && (
                         <li>
                             <a href={`tel:${settings.phone}`} className="inline-flex items-center gap-2 hover:text-primary">
@@ -69,19 +108,6 @@ export default function Footer({ settings }: { settings: ISettings }) {
                     )}
                 </ul>
             </div>
-            {hasSocials && (
-                 <div>
-                    <h4 className="text-lg font-semibold">Follow Us</h4>
-                    <div className="mt-2 flex justify-center gap-4 md:justify-start">
-                        {socialLinks.map(social => social.href && (
-                            <Link key={social.name} href={social.href} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
-                                <social.icon className="h-6 w-6" />
-                                <span className="sr-only">{social.name}</span>
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            )}
         </div>
       </div>
     </footer>

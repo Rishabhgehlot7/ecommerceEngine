@@ -36,6 +36,8 @@ export interface IProduct extends Document {
   dimensions?: IDimensions;
   weight?: number; // in a standard unit like kg
   isActive: boolean;
+  averageRating: number;
+  numReviews: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -76,6 +78,8 @@ const ProductSchema: Schema = new Schema({
   dimensions: DimensionsSchema,
   weight: { type: Number, min: 0 }, // Assuming weight in kg
   isActive: { type: Boolean, default: true },
+  averageRating: { type: Number, default: 0 },
+  numReviews: { type: Number, default: 0 },
 }, { timestamps: true });
 
 ProductSchema.pre('save', function(next) {

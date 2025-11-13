@@ -1,9 +1,8 @@
 
 'use client';
 
-import type { ISettings } from '@/models/Setting';
-import type { ICategory } from '@/models/Category';
-import { Facebook, Instagram, Twitter, Youtube, Phone, Mail, ShoppingBag } from 'lucide-react';
+import { useSettings } from '@/hooks/use-settings';
+import { Facebook, Instagram, Twitter, Youtube, Phone, Mail } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Separator } from '../ui/separator';
@@ -25,7 +24,8 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 
-export default function Footer({ settings, categories }: { settings: ISettings, categories: ICategory[] }) {
+export default function Footer() {
+    const { settings, categories } = useSettings();
     const hasSocials = settings.socials && Object.values(settings.socials).some(link => !!link);
     
     const socialLinks = [
@@ -147,4 +147,3 @@ export default function Footer({ settings, categories }: { settings: ISettings, 
     </footer>
   );
 }
-

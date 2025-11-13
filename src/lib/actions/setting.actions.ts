@@ -58,16 +58,19 @@ export async function updateSettings(formData: FormData) {
     await dbConnect();
 
     const currentSettings = await getSettings();
-    const updates: Partial<ISettings> = {};
+    const updates: { [key: string]: any } = {};
     
     // Iterate over form entries and build updates object
     for (const [key, value] of formData.entries()) {
         if (key.startsWith('socials.')) {
             const socialKey = key.split('.')[1];
-            if (!updates.socials) updates.socials = {};
+            if (!updates.socials) {
+                // Initialize from current settings to not lose other social links
+                updates.socials = { ...currentSettings.socials };
+            }
             (updates.socials as any)[socialKey] = value;
         } else {
-            (updates as any)[key] = value;
+            updates[key] = value;
         }
     }
 
@@ -79,20 +82,27 @@ export async function updateSettings(formData: FormData) {
             updates.logoUrl = uploadedUrl;
         }
     } else if (formData.has('logo') && !imageFile) {
-        // This case handles when an existing image is removed but no new one is uploaded.
-        // The dropzone component will not include the `currentImage` hidden input if removed.
-        // We check if 'logo' key exists (from the file input) but is empty.
         updates.logoUrl = '';
-    } else if (currentSettings.logoUrl) {
-        // If no new image action, keep the old one
-        updates.logoUrl = currentSettings.logoUrl;
     }
 
+    // Since forms are separate, we only want to update the fields present in the form.
+    // We build a dynamic update object based on what's submitted.
+    const updateObject: { [key: string]: any } = {};
+    Object.keys(updates).forEach(key => {
+        if (key.includes('.')) {
+            const [parent, child] = key.split('.');
+            if (!updateObject[parent]) updateObject[parent] = {};
+            updateObject[parent][child] = updates[key];
+        } else {
+            updateObject[key] = updates[key];
+        }
+    });
 
-    const settings = await Setting.findOneAndUpdate({}, { $set: updates }, { new: true, upsert: true, setDefaultsOnInsert: true });
+
+    const settings = await Setting.findOneAndUpdate({}, { $set: updateObject }, { new: true, upsert: true, setDefaultsOnInsert: true });
     
-    revalidatePath('/admin/settings', 'layout');
-    revalidatePath('/', 'layout');
+    // Revalidate the entire site layout to reflect changes everywhere.
+    revalidatePath('.', 'layout');
 
     return JSON.parse(JSON.stringify(settings));
 }

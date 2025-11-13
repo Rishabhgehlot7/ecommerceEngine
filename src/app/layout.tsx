@@ -12,6 +12,7 @@ import { getAllCategories } from '@/lib/actions/category.actions';
 import { ThemeProvider } from '@/components/theme-provider';
 import Script from 'next/script';
 import { hexToHsl } from '@/lib/utils';
+import { SettingsProvider } from '@/hooks/use-settings';
 
 export const metadata: Metadata = {
   title: 'BlueCart',
@@ -47,14 +48,16 @@ export default async function RootLayout({
           defaultTheme={settings.theme}
           enableSystem
         >
-          <AuthProvider>
-            <WishlistProvider>
-              <CartProvider>
-                <RootLayoutClient settings={settings} categories={categories}>{children}</RootLayoutClient>
-                <Toaster />
-              </CartProvider>
-            </WishlistProvider>
-          </AuthProvider>
+          <SettingsProvider settings={settings} categories={categories}>
+            <AuthProvider>
+              <WishlistProvider>
+                <CartProvider>
+                  <RootLayoutClient>{children}</RootLayoutClient>
+                  <Toaster />
+                </CartProvider>
+              </WishlistProvider>
+            </AuthProvider>
+          </SettingsProvider>
         </ThemeProvider>
         <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       </body>

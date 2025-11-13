@@ -58,44 +58,38 @@ export async function updateSettings(formData: FormData) {
     await dbConnect();
 
     const currentSettings = await getSettings();
-    let finalLogoUrl = currentSettings.logoUrl || '';
+    const updates: Partial<ISettings> = {};
+    
+    // Iterate over form entries and build updates object
+    for (const [key, value] of formData.entries()) {
+        if (key.startsWith('socials.')) {
+            const socialKey = key.split('.')[1];
+            if (!updates.socials) updates.socials = {};
+            (updates.socials as any)[socialKey] = value;
+        } else {
+            (updates as any)[key] = value;
+        }
+    }
 
     const imageFile = formData.get('logo') as File | null;
-    const currentLogoUrlFromForm = formData.get('currentImage');
     
-    // If there's an image file, it means a new one was uploaded or an existing one was replaced.
     if (imageFile && imageFile.size > 0) {
         const uploadedUrl = await uploadImage(imageFile);
         if (uploadedUrl) {
-            finalLogoUrl = uploadedUrl;
+            updates.logoUrl = uploadedUrl;
         }
-    } else if (currentLogoUrlFromForm === null) {
-        // If there's no image file AND the currentImage field is not present, it means the image was removed.
-        finalLogoUrl = '';
-    } else {
-        // If no new file and currentImage exists, keep the existing logo.
-        finalLogoUrl = currentLogoUrlFromForm as string;
+    } else if (formData.has('logo') && !imageFile) {
+        // This case handles when an existing image is removed but no new one is uploaded.
+        // The dropzone component will not include the `currentImage` hidden input if removed.
+        // We check if 'logo' key exists (from the file input) but is empty.
+        updates.logoUrl = '';
+    } else if (currentSettings.logoUrl) {
+        // If no new image action, keep the old one
+        updates.logoUrl = currentSettings.logoUrl;
     }
-    
-    const updates = {
-        storeName: formData.get('storeName') as string,
-        contactEmail: formData.get('contactEmail') as string,
-        storeAddress: formData.get('storeAddress') as string,
-        phone: formData.get('phone') as string,
-        whatsapp: formData.get('whatsapp') as string,
-        socials: {
-            facebook: formData.get('socials.facebook') as string,
-            instagram: formData.get('socials.instagram') as string,
-            twitter: formData.get('socials.twitter') as string,
-            youtube: formData.get('socials.youtube') as string,
-        },
-        theme: formData.get('theme') as 'light' | 'dark' | 'system',
-        font: formData.get('font') as string,
-        primaryColor: formData.get('primaryColor') as string,
-        logoUrl: finalLogoUrl,
-    };
 
-    const settings = await Setting.findOneAndUpdate({}, updates, { new: true, upsert: true, setDefaultsOnInsert: true });
+
+    const settings = await Setting.findOneAndUpdate({}, { $set: updates }, { new: true, upsert: true, setDefaultsOnInsert: true });
     
     revalidatePath('/admin/settings', 'layout');
     revalidatePath('/', 'layout');

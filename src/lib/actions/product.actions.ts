@@ -112,21 +112,23 @@ export async function getProducts(): Promise<IProduct[]> {
     await dbConnect();
     // Eagerly import Category model to prevent MissingSchemaError
     await Category.find({});
-    const products = await Product.find({}).populate('category').sort({ createdAt: -1 });
+    const products = await Product.find({}).populate('category').sort({ createdAt: -1 }).lean();
     return JSON.parse(JSON.stringify(products));
 }
 
 
 export async function getProduct(id: string): Promise<IProduct | null> {
     await dbConnect();
-    const product = await Product.findById(id).populate('category');
+    const product = await Product.findById(id).populate('category').lean();
+    if (!product) return null;
     return JSON.parse(JSON.stringify(product));
 }
 
 export async function getProductBySlug(slug: string): Promise<IProduct | null> {
   await dbConnect();
   await Category.find({}); // Ensure category schema is registered
-  const product = await Product.findOne({ slug }).populate('category');
+  const product = await Product.findOne({ slug }).populate('category').lean();
+  if (!product) return null;
   return JSON.parse(JSON.stringify(product));
 }
 

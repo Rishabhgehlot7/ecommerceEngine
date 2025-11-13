@@ -41,10 +41,9 @@ async function uploadImage(file: File): Promise<string | null> {
 
 export async function getSettings(): Promise<ISettings> {
     await dbConnect();
-    let settings = await Setting.findOne();
+    let settings = await Setting.findOne().lean();
     if (!settings) {
-        settings = new Setting(defaultSettings);
-        await settings.save();
+        settings = (await new Setting(defaultSettings).save()).toObject();
     }
     
     const plainSettings = JSON.parse(JSON.stringify(settings));

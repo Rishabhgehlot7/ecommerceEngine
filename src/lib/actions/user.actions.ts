@@ -26,6 +26,15 @@ const loginSchema = z.object({
   password: z.string(),
 });
 
+const profileUpdateSchema = z.object({
+    id: z.string(),
+    firstName: z.string().min(1).optional(),
+    lastName: z.string().min(1).optional(),
+    currentPassword: z.string().optional(),
+    newPassword: z.string().optional(),
+});
+
+
 async function createSession(userId: string) {
   const token = sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
   cookies().set(COOKIE_NAME, token, {
@@ -164,4 +173,34 @@ export async function updateUser(formData: FormData) {
 
   revalidatePath('/admin/customers');
   revalidatePath(`/admin/customers/${id}/edit`);
+}
+
+export async function updateUserProfile(data: unknown) {
+    const result = profileUpdateSchema.safeParse(data);
+    if (!result.success) {
+        throw new Error('Invalid data provided.');
+    }
+    
+    const { id, firstName, lastName, currentPassword, newPassword } = result.data;
+
+    await dbConnect();
+    const user = await User.findById(id).select('+password');
+
+    if (!user) {
+        throw new Error('User not found.');
+    }
+
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
+
+    if (currentPassword && newPassword) {
+        const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+        if (!isPasswordValid) {
+            throw new Error('Incorrect current password.');
+        }
+        user.password = await bcrypt.hash(newPassword, 10);
+    }
+    
+    await user.save();
+    revalidatePath('/profile');
 }

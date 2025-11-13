@@ -53,19 +53,25 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+          {user.role && (
+            <DropdownMenuItem asChild>
+              <Link href="/admin">
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Dashboard</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem asChild>
-            <Link href="/admin">
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                <span>Dashboard</span>
+            <Link href="/profile">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem disabled>
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem disabled>
-            <ShoppingBasket className="mr-2 h-4 w-4" />
-            <span>My Orders</span>
+          <DropdownMenuItem asChild>
+             <Link href="/orders">
+              <ShoppingBasket className="mr-2 h-4 w-4" />
+              <span>My Orders</span>
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

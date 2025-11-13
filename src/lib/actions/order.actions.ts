@@ -123,6 +123,20 @@ export async function getOrders(): Promise<IOrder[]> {
     return JSON.parse(JSON.stringify(orders));
 }
 
+export async function getOrdersForUser(): Promise<IOrder[]> {
+    await dbConnect();
+    const user = await getUserFromSession();
+    if (!user) {
+        return [];
+    }
+    const orders = await Order.find({ user: user._id })
+        .sort({ createdAt: -1 })
+        .lean();
+
+    return JSON.parse(JSON.stringify(orders));
+}
+
+
 export async function getOrderById(id: string): Promise<IOrder | null> {
     await dbConnect();
     await Product.find({}); // Ensure product model is registered
@@ -151,4 +165,6 @@ export async function updateOrderStatus(orderId: string, status: string) {
     await order.save();
     revalidatePath(`/admin/orders/${orderId}`);
     revalidatePath('/admin/orders');
+    revalidatePath(`/orders/${orderId}`);
+    revalidatePath('/orders');
 }

@@ -5,6 +5,7 @@ import dbConnect from '../db';
 import Role, { type IRole } from '@/models/Role';
 import User from '@/models/User';
 import { revalidatePath } from 'next/cache';
+import { PREDEFINED_ROLES } from '../predefined-roles';
 
 export async function createRole(formData: FormData) {
   await dbConnect();
@@ -73,4 +74,28 @@ export async function deleteRole(id: string) {
   await Role.findByIdAndDelete(id);
 
   revalidatePath('/admin/roles');
+}
+
+export async function seedPredefinedRoles(): Promise<{ created: number, existing: number }> {
+    await dbConnect();
+
+    let createdCount = 0;
+    let existingCount = 0;
+
+    for (const roleData of PREDEFINED_ROLES) {
+        const existingRole = await Role.findOne({ name: roleData.name });
+        if (existingRole) {
+            existingCount++;
+        } else {
+            const newRole = new Role(roleData);
+            await newRole.save();
+            createdCount++;
+        }
+    }
+    
+    if (createdCount > 0) {
+        revalidatePath('/admin/roles');
+    }
+
+    return { created: createdCount, existing: existingCount };
 }

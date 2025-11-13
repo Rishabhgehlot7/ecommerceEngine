@@ -7,6 +7,7 @@ import RootLayoutClient from './layout-client';
 import { AuthProvider } from '@/hooks/use-auth';
 import { WishlistProvider } from '@/hooks/use-wishlist';
 import { getSettings } from '@/lib/actions/setting.actions';
+import { getAllCategories } from '@/lib/actions/category.actions';
 import { ThemeProvider } from '@/components/theme-provider';
 import Script from 'next/script';
 
@@ -21,6 +22,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const settings = await getSettings();
+  const categories = await getAllCategories();
 
   return (
     <html lang="en" className={cn("h-full")} suppressHydrationWarning>
@@ -45,7 +47,7 @@ export default async function RootLayout({
           <AuthProvider>
             <WishlistProvider>
               <CartProvider>
-                <RootLayoutClient settings={settings}>{children}</RootLayoutClient>
+                <RootLayoutClient settings={settings} categories={categories}>{children}</RootLayoutClient>
                 <Toaster />
               </CartProvider>
             </WishlistProvider>

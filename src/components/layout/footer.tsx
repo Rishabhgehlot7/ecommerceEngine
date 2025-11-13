@@ -2,8 +2,11 @@
 'use client';
 
 import type { ISettings } from '@/models/Setting';
-import { Facebook, Instagram, Twitter, Youtube, Phone, Mail } from 'lucide-react';
+import type { ICategory } from '@/models/Category';
+import { Facebook, Instagram, Twitter, Youtube, Phone, Mail, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { Separator } from '../ui/separator';
 
 // Simple SVG for WhatsApp
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -22,7 +25,7 @@ const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 
-export default function Footer({ settings }: { settings: ISettings }) {
+export default function Footer({ settings, categories }: { settings: ISettings, categories: ICategory[] }) {
     const hasSocials = settings.socials && Object.values(settings.socials).some(link => !!link);
     
     const socialLinks = [
@@ -31,18 +34,81 @@ export default function Footer({ settings }: { settings: ISettings }) {
         { name: 'Twitter', href: settings.socials?.twitter, icon: Twitter },
         { name: 'YouTube', href: settings.socials?.youtube, icon: Youtube },
     ];
+    
+    const footerLinks = {
+        'Company': [
+            { name: 'About Us', href: '/about' },
+            { name: 'Contact Us', href: '/contact' },
+        ],
+        'Policies': [
+            { name: 'Privacy Policy', href: '/privacy-policy' },
+            { name: 'Terms & Conditions', href: '/terms-conditions' },
+            { name: 'Refund & Return Policy', href: '/refund-policy' },
+        ]
+    }
+
+    const topLevelCategories = categories.filter(c => !c.parent).slice(0, 5);
+
 
   return (
     <footer className="border-t bg-card">
-      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 text-center md:grid-cols-3 md:text-left">
-            <div>
-                <h4 className="text-lg font-semibold">{settings.storeName}</h4>
-                <p className="mt-2 text-sm text-muted-foreground">© {new Date().getFullYear()} All rights reserved.</p>
+      <div className="container mx-auto px-4 pt-12 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-5">
+            <div className="col-span-2 md:col-span-1">
+                <Link href="/" className="flex items-center gap-2">
+                    {settings.logoUrl ? (
+                        <Image src={settings.logoUrl} alt={settings.storeName} width={120} height={40} className="h-10 w-auto" />
+                    ) : (
+                        <span className="font-headline text-2xl font-bold">{settings.storeName}</span>
+                    )}
+                </Link>
+                
+                 {hasSocials && (
+                     <div className="mt-4 flex gap-4">
+                        {socialLinks.map(social => social.href && (
+                            <Link key={social.name} href={social.href} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
+                                <social.icon className="h-6 w-6" />
+                                <span className="sr-only">{social.name}</span>
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </div>
+            
+            {Object.entries(footerLinks).map(([title, links]) => (
+                 <div key={title}>
+                    <h4 className="font-semibold">{title}</h4>
+                    <ul className="mt-4 space-y-3 text-sm">
+                        {links.map(link => (
+                            <li key={link.name}>
+                                <Link href={link.href} className="text-muted-foreground hover:text-primary">
+                                    {link.name}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ))}
+             <div>
+                <h4 className="font-semibold">Categories</h4>
+                <ul className="mt-4 space-y-3 text-sm">
+                    {topLevelCategories.map(cat => (
+                        <li key={cat._id}>
+                            <Link href={`/category/${cat.slug}`} className="text-muted-foreground hover:text-primary">
+                                {cat.name}
+                            </Link>
+                        </li>
+                    ))}
+                     <li>
+                        <Link href="/shop" className="font-medium text-primary hover:underline">
+                            View All
+                        </Link>
+                    </li>
+                </ul>
             </div>
              <div>
-                <h4 className="text-lg font-semibold">Contact Us</h4>
-                <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+                <h4 className="font-semibold">Contact Us</h4>
+                <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
                     {settings.phone && (
                         <li>
                             <a href={`tel:${settings.phone}`} className="inline-flex items-center gap-2 hover:text-primary">
@@ -69,21 +135,16 @@ export default function Footer({ settings }: { settings: ISettings }) {
                     )}
                 </ul>
             </div>
-            {hasSocials && (
-                 <div>
-                    <h4 className="text-lg font-semibold">Follow Us</h4>
-                    <div className="mt-2 flex justify-center gap-4 md:justify-start">
-                        {socialLinks.map(social => social.href && (
-                            <Link key={social.name} href={social.href} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary">
-                                <social.icon className="h-6 w-6" />
-                                <span className="sr-only">{social.name}</span>
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            )}
+        </div>
+        <Separator className="my-8" />
+        <div className="flex flex-col items-center justify-between gap-4 pb-8 sm:flex-row">
+            <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} {settings.storeName}. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground">
+                Designed & Developed by <a href="https://boostengine.in" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-primary">Boost Engine</a>.
+            </p>
         </div>
       </div>
     </footer>
   );
 }
+

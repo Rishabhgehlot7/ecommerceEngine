@@ -1,24 +1,4 @@
-import { SignupForm } from "@/components/auth/signup-form";
-import Link from "next/link";
-
+// This file is no longer in use. The page has been moved to /src/app/(auth)/signup/page.tsx to use the correct layout.
 export default function SignupPage() {
-  return (
-    <div className="h-screen flex items-center justify-center p-8">
-      <div className="mx-auto grid w-full max-w-[350px] gap-6">
-        <div className="grid gap-2 text-center">
-          <h1 className="text-3xl font-bold">Create an account</h1>
-          <p className="text-balance text-muted-foreground">
-            Enter your details below to create your account
-          </p>
-        </div>
-        <SignupForm />
-        <div className="mt-4 text-center text-sm">
-          Already have an account?{" "}
-          <Link href="/login" className="underline">
-            Login
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+  return null;
 }

@@ -7,9 +7,15 @@ import type { IRole } from '@/models/Role';
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import SeedRolesButton from './seed-roles-button';
+import {
+  Card,
+} from '@/components/ui/card';
+import { RoleCard } from './role-card';
+
+type RoleWithUserCount = IRole & { userCount: number };
 
 export default async function AdminRolesPage() {
-  const roles: IRole[] = await getRoles();
+  const roles: RoleWithUserCount[] = await getRoles();
 
   return (
     <div className="space-y-6">
@@ -28,7 +34,23 @@ export default async function AdminRolesPage() {
         </div>
       </div>
 
-      <DataTable columns={columns} data={roles} />
+       {/* Mobile View */}
+      <div className="grid gap-4 md:hidden">
+        {roles.map((role) => (
+          <RoleCard key={role._id} role={role} />
+        ))}
+         {roles.length === 0 && (
+            <Card className="flex items-center justify-center p-10">
+                <p className="text-muted-foreground">No roles found.</p>
+            </Card>
+        )}
+      </div>
+
+      {/* Desktop View */}
+      <div className="hidden md:block">
+        <DataTable columns={columns} data={roles} />
+      </div>
+
     </div>
   );
 }

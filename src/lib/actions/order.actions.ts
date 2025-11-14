@@ -25,10 +25,10 @@ interface CreateOrderPayload {
         phone: string;
     },
     items: {
-        product: string; // Product ID
+        productId: string; // The parent Product ID
         quantity: number;
         price: number;
-        variantSku?: string;
+        variantSku?: string; // The specific variant SKU
     }[],
     totalAmount: number;
 }
@@ -43,7 +43,7 @@ export async function createOrder(payload: CreateOrderPayload) {
     
     // Create OrderItems first
     const orderItems = await OrderItem.create(payload.items.map(item => ({
-        product: item.product,
+        product: item.productId, // Use the parent product ID for the ref
         quantity: item.quantity,
         price: item.price,
         variantSku: item.variantSku,
@@ -63,7 +63,7 @@ export async function createOrder(payload: CreateOrderPayload) {
 
     const razorpayOrder = await razorpay.orders.create({
         amount: Math.round(payload.totalAmount * 100), // amount in the smallest currency unit
-        currency: 'INR', // or your preferred currency
+        currency: 'INR',
         receipt: orderId,
     });
     

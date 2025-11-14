@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -44,8 +45,10 @@ export default function ProductCard({ product }: ProductCardProps) {
       e.preventDefault();
       e.stopPropagation();
       const productForCart = {
-        ...product,
         id: product._id,
+        productId: product._id,
+        name: product.name,
+        price: product.salePrice || product.price,
         image: imageUrl || '',
       };
       addToCart(productForCart as any);

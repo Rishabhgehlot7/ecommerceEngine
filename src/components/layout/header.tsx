@@ -134,7 +134,6 @@ export default function Header() {
   const { settings, categories } = useSettings();
   const { logoUrl, storeName } = settings;
   const { totalItems: totalCartItems } = useCart();
-  const { totalItems: totalWishlistItems } = useWishlist();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -193,23 +192,16 @@ export default function Header() {
                 <SearchSuggestions />
             </div>
 
-            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSearchOpen(prev => !prev)}>
-                <Search className="h-6 w-6" />
-                <span className="sr-only">Search</span>
-            </Button>
+            <div className="hidden md:flex md:items-center md:gap-2">
+              <UserNav />
+              <Button asChild variant="ghost" size="icon" className="relative">
+                  <Link href="/wishlist">
+                      <Heart className="h-6 w-6" />
+                      <span className="sr-only">Open wishlist</span>
+                  </Link>
+              </Button>
+            </div>
 
-            <UserNav />
-            <Button asChild variant="ghost" size="icon" className="relative">
-                <Link href="/wishlist">
-                    <Heart className="h-6 w-6" />
-                    {totalWishlistItems > 0 && (
-                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                    {totalWishlistItems}
-                    </span>
-                )}
-                    <span className="sr-only">Open wishlist</span>
-                </Link>
-            </Button>
             <CartSheet>
                 <Button variant="ghost" size="icon" className="relative">
                 <ShoppingBag className="h-6 w-6" />

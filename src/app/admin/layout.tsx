@@ -23,6 +23,7 @@ import {
   Sun,
   ShieldCheck,
   ExternalLink,
+  Megaphone,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -100,6 +101,11 @@ export default function AdminLayout({
       href: '/admin/roles',
       label: 'Roles & Permissions',
       icon: ShieldCheck,
+    },
+    {
+        href: '/admin/marketing',
+        label: 'Marketing',
+        icon: Megaphone,
     },
     {
       href: '/admin/analytics',

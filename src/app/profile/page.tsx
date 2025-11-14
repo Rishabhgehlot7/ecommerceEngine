@@ -16,6 +16,7 @@ import { updateUserProfile } from '@/lib/actions/user.actions';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import ImageDropzone from '@/components/admin/image-dropzone';
+import { Label } from '@/components/ui/label';
 
 const profileSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),

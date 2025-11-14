@@ -2,12 +2,34 @@
 import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
 import Image from 'next/image';
+import { getActiveBanners } from '@/lib/actions/banner.actions';
+import type { IBanner } from '@/models/Banner';
 
-export default function AuthLayout({
+async function getAuthImage() {
+    try {
+        const banners = await getActiveBanners();
+        if (banners.length > 0) {
+            const randomIndex = Math.floor(Math.random() * banners.length);
+            return banners[randomIndex];
+        }
+    } catch (error) {
+        console.error("Failed to fetch banners for auth layout:", error);
+    }
+    // Fallback image if no banners are found or if there's an error
+    return {
+        title: 'Auth background',
+        image: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070&auto=format&fit=crop',
+    };
+}
+
+
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const authImage: { title: string; image: string } = await getAuthImage();
+
   return (
     <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-2">
       <div className="hidden bg-muted lg:block">
@@ -22,8 +44,8 @@ export default function AuthLayout({
           <div className="my-auto">
             <div className="relative h-[400px] w-full">
                <Image 
-                src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070&auto=format&fit=crop"
-                alt="Auth background"
+                src={authImage.image}
+                alt={authImage.title}
                 fill
                 className="object-cover rounded-xl"
                />

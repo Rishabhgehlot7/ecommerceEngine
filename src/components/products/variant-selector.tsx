@@ -44,6 +44,7 @@ export default function VariantSelector({ product }: VariantSelectorProps) {
   }, [optionTypes]);
 
   const selectedVariant = useMemo(() => {
+    if (!product.variants || product.variants.length === 0) return null;
     return product.variants.find(variant => 
       variant.options.every(opt => selectedOptions[opt.name] === opt.value)
     );
@@ -57,15 +58,11 @@ export default function VariantSelector({ product }: VariantSelectorProps) {
     }));
   };
   
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price);
-  };
-
   const productForButtons = {
+    // Use variant SKU as the unique ID for the cart item, or product ID if no variants
     id: selectedVariant?.sku || product._id,
+    // ALWAYS use the parent product's ID for linking back to the product
+    productId: product._id,
     name: selectedVariant?.name || product.name,
     price: selectedVariant?.price || product.salePrice || product.price,
     image: product.media?.[0]?.url || '',
@@ -108,4 +105,3 @@ export default function VariantSelector({ product }: VariantSelectorProps) {
     </div>
   );
 }
-

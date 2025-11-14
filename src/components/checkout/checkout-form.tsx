@@ -60,10 +60,10 @@ export default function CheckoutForm() {
         const orderPayload = {
             shippingAddress: values,
             items: cartItems.map(item => ({
-                product: item.id, // In cart, 'id' is the product ID
+                productId: item.productId, // Pass the parent product ID
                 quantity: item.quantity,
                 price: item.price,
-                variantSku: item.id.includes('-') ? item.id : undefined // Simple check if it's a variant SKU
+                variantSku: item.id.includes('-') ? item.id : undefined
             })),
             totalAmount: totalPrice
         }

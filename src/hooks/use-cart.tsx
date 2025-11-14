@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
@@ -5,7 +6,8 @@ import type { IProduct } from '@/models/Product';
 import { useToast } from './use-toast';
 
 export type CartProduct = {
-  id: string;
+  id: string; // Unique ID for the cart item (can be variant SKU or product ID)
+  productId: string; // Always the parent product's _id
   name: string;
   price: number;
   image: string;

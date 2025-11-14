@@ -38,27 +38,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<ClientUser | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
-
+  
   useEffect(() => {
     async function checkSession() {
-        try {
-            const sessionUser = await getUserFromSession();
-            if (sessionUser) {
-                const clientUser: ClientUser = {
-                    ...JSON.parse(JSON.stringify(sessionUser)),
-                    id: sessionUser._id,
-                    displayName: `${sessionUser.firstName} ${sessionUser.lastName}`,
-                };
-                setUser(clientUser);
-            }
-        } catch (error) {
-            console.error("Session check failed", error);
-        } finally {
-            setIsUserLoading(false);
+        setIsUserLoading(true);
+        const sessionUser = await getUserFromSession();
+        if (sessionUser) {
+             const clientUser: ClientUser = {
+                ...JSON.parse(JSON.stringify(sessionUser)),
+                id: sessionUser._id,
+                displayName: `${sessionUser.firstName} ${sessionUser.lastName}`,
+            };
+            setUser(clientUser);
+        } else {
+            setUser(null);
         }
+        setIsUserLoading(false);
     }
     checkSession();
   }, []);
+
 
   const login = useCallback(async (email: string, password: string) => {
     setIsUserLoading(true);

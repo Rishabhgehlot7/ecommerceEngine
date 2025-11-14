@@ -70,3 +70,13 @@ export async function getReviewsForProduct(productId: string): Promise<IReview[]
   
   return JSON.parse(JSON.stringify(reviews));
 }
+
+export async function getHomepageReviews(limit: number = 4): Promise<IReview[]> {
+  await dbConnect();
+  const reviews = await Review.find({})
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .populate('user', 'firstName lastName')
+    .lean();
+  return JSON.parse(JSON.stringify(reviews));
+}

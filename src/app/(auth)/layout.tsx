@@ -4,6 +4,7 @@ import { ShoppingBag } from 'lucide-react';
 import Image from 'next/image';
 import { getActiveBanners } from '@/lib/actions/banner.actions';
 import type { IBanner } from '@/models/Banner';
+import { getSettings } from '@/lib/actions/setting.actions';
 
 async function getAuthImage() {
     try {
@@ -29,6 +30,7 @@ export default async function AuthLayout({
   children: React.ReactNode;
 }) {
   const authImage: { title: string; image: string } = await getAuthImage();
+  const settings = await getSettings();
 
   return (
     <div className="grid min-h-screen w-full grid-cols-1 md:grid-cols-2">
@@ -48,7 +50,7 @@ export default async function AuthLayout({
                     className="flex items-center gap-2 text-lg font-semibold text-white"
                 >
                     <ShoppingBag className="h-6 w-6" />
-                    <span>BlueCart</span>
+                    <span>{settings.storeName || 'BlueCart'}</span>
                 </Link>
             </div>
             <div className="absolute bottom-8 left-8 text-white">

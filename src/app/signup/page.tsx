@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function SignupPage() {
   return (
-    <main className=" h-screen w-screen flex justify-center items-center">
+    <div className="flex items-center justify-center p-8">
       <div className="mx-auto grid w-full max-w-[350px] gap-6">
         <div className="grid gap-2 text-center">
           <h1 className="text-3xl font-bold">Create an account</h1>
@@ -19,6 +19,6 @@ export default function SignupPage() {
           </Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

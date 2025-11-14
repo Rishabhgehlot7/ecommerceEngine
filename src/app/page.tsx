@@ -2,6 +2,7 @@ import HeroSlider from '@/components/home/hero-slider';
 import CategorySection from '@/components/home/category-section';
 import FeaturedProductsSection from '@/components/home/featured-products-section';
 import ReviewsSection from '@/components/home/reviews-section';
+import AdBanner from '@/components/home/ad-banner';
 
 export default function HomePage() {
   return (
@@ -9,6 +10,7 @@ export default function HomePage() {
       <HeroSlider />
       <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <CategorySection />
+        <AdBanner />
         <FeaturedProductsSection />
         <ReviewsSection />
       </div>

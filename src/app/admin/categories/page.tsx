@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -25,6 +26,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import DeleteCategoryButton from '@/components/admin/categories/delete-category-button';
 
+export const dynamic = 'force-dynamic';
 
 function CategoryCard({ category }: { category: ICategory }) {
   const parent = category.parent as ICategory | null;

@@ -33,31 +33,32 @@ export default async function AuthLayout({
   return (
     <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-2">
       <div className="hidden bg-muted lg:block">
-        <div className="flex h-full flex-col p-8 text-white">
-          <Link
-              href="/"
-              className="flex items-center gap-2 text-lg font-semibold text-foreground"
-            >
-              <ShoppingBag className="h-6 w-6" />
-              <span>BlueCart</span>
-          </Link>
-          <div className="my-auto">
-            <div className="relative h-[400px] w-full">
-               <Image 
-                src={authImage.image}
-                alt={authImage.title}
-                fill
-                className="object-cover rounded-xl"
-               />
-               <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-primary/10 rounded-xl" />
+        <div className="relative h-full">
+            <Image 
+            src={authImage.image}
+            alt={authImage.title}
+            fill
+            className="object-cover"
+            priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/20" />
+            <div className="absolute top-8 left-8">
+                <Link
+                    href="/"
+                    className="flex items-center gap-2 text-lg font-semibold text-white"
+                >
+                    <ShoppingBag className="h-6 w-6" />
+                    <span>BlueCart</span>
+                </Link>
             </div>
-             <h1 className="mt-8 text-3xl font-bold text-foreground">
-              Discover a World of Products
-            </h1>
-            <p className="mt-2 text-muted-foreground">
-              Join our community and start shopping from the best brands.
-            </p>
-          </div>
+            <div className="absolute bottom-8 left-8 text-white">
+                <h1 className="mt-8 text-3xl font-bold">
+                Discover a World of Products
+                </h1>
+                <p className="mt-2 max-w-sm text-white/80">
+                Join our community and start shopping from the best brands.
+                </p>
+            </div>
         </div>
       </div>
       <div className="flex items-center justify-center p-8">

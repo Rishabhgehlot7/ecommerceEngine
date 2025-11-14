@@ -1,3 +1,4 @@
+
 import HeroSlider from '@/components/home/hero-slider';
 import CategorySection from '@/components/home/category-section';
 import ReviewsSection from '@/components/home/reviews-section';
@@ -30,6 +31,13 @@ export default async function HomePage() {
             title="Best Deals Under ₹499"
             description="Great quality products at an affordable price."
             products={under499}
+          />
+        )}
+        {allProducts.length > 0 && (
+          <ProductShowcase 
+            title="All Products"
+            description="Browse our complete collection."
+            products={allProducts}
           />
         )}
         <ReviewsSection />

@@ -302,17 +302,14 @@ export async function updateUserProfile(formData: FormData) {
     revalidatePath('.', 'layout');
 }
 
-export async function addAddress(addressData: unknown) {
+export async function addAddress(userId: string, addressData: unknown) {
     await dbConnect();
-    const token = cookies().get(COOKIE_NAME)?.value;
-    const user = await getUserFromSession(token);
-    if (!user) throw new Error("You must be logged in.");
+
+    const dbUser = await User.findById(userId);
+    if (!dbUser) throw new Error("User not found.");
 
     const result = addressSchema.safeParse(addressData);
     if (!result.success) throw new Error("Invalid address data.");
-    
-    const dbUser = await User.findById(user._id);
-    if (!dbUser) throw new Error("User not found.");
     
     if (result.data.isDefault) {
         dbUser.addresses.forEach(addr => addr.isDefault = false);
@@ -323,17 +320,14 @@ export async function addAddress(addressData: unknown) {
     revalidatePath('/checkout');
 }
 
-export async function updateAddress(addressId: string, addressData: unknown) {
+export async function updateAddress(userId: string, addressId: string, addressData: unknown) {
     await dbConnect();
-    const token = cookies().get(COOKIE_NAME)?.value;
-    const user = await getUserFromSession(token);
-    if (!user) throw new Error("You must be logged in.");
+
+    const dbUser = await User.findById(userId);
+    if (!dbUser) throw new Error("User not found.");
     
     const result = addressSchema.safeParse(addressData);
     if (!result.success) throw new Error("Invalid address data.");
-
-    const dbUser = await User.findById(user._id);
-    if (!dbUser) throw new Error("User not found.");
 
     if (result.data.isDefault) {
         dbUser.addresses.forEach(addr => addr.isDefault = false);
@@ -342,7 +336,6 @@ export async function updateAddress(addressId: string, addressData: unknown) {
     const addressIndex = dbUser.addresses.findIndex(addr => addr._id.toString() === addressId);
     if (addressIndex === -1) throw new Error("Address not found.");
     
-    // Create a new plain object for the updated address to avoid mongoose object issues
     const updatedAddress = {
         ...dbUser.addresses[addressIndex].toObject(),
         ...result.data
@@ -354,14 +347,11 @@ export async function updateAddress(addressId: string, addressData: unknown) {
     revalidatePath('/checkout');
 }
 
-export async function deleteAddress(addressId: string) {
+export async function deleteAddress(userId: string, addressId: string) {
     await dbConnect();
-    const token = cookies().get(COOKIE_NAME)?.value;
-    const user = await getUserFromSession(token);
-    if (!user) throw new Error("You must be logged in.");
-
+    
     await User.updateOne(
-        { _id: user._id },
+        { _id: userId },
         { $pull: { addresses: { _id: addressId } } }
     );
     revalidatePath('/profile');
@@ -431,3 +421,5 @@ export async function deleteUserPermanently(userId: string) {
 
     revalidatePath('/admin/customers');
 }
+
+    

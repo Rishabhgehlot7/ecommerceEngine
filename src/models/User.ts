@@ -58,8 +58,8 @@ const UserSchema: Schema = new Schema({
 }, { timestamps: true });
 
 UserSchema.pre('save', function(this: IUser, next) {
-    // Only validate auth method for non-guest users
-    if (!this.isGuest) {
+    // Only validate auth method for new, non-guest users
+    if (this.isNew && !this.isGuest) {
       if (!this.password && !this.googleId && !this.phone) {
         return next(new Error('Authentication method (password, google, or phone) is required for non-guest users.'));
       }
@@ -80,3 +80,5 @@ UserSchema.pre('save', function(this: IUser, next) {
 });
 
 export default models.User || model<IUser>('User', UserSchema);
+
+    

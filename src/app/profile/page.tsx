@@ -18,9 +18,10 @@ import { useState } from 'react';
 import ImageDropzone from '@/components/admin/image-dropzone';
 import { Label } from '@/components/ui/label';
 import { Address, PlusCircle, Home, Trash2, Edit } from 'lucide-react';
-import { AddressForm, addressSchema } from '@/components/profile/address-form';
+import { AddressForm } from '@/components/profile/address-form';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import type { IAddress } from '@/models/User';
+import { addressSchema } from '@/lib/schemas/address.schema';
 
 function ProfileForm({ user }: { user: ClientUser }) {
   const { toast } = useToast();
@@ -161,10 +162,10 @@ function AddressManagement({ user }: { user: ClientUser }) {
     const handleAddressAction = async (values: z.infer<typeof addressSchema>) => {
         try {
             if (editingAddress) {
-                await updateAddress(editingAddress._id, values);
+                await updateAddress(user.id, editingAddress._id, values);
                 toast({ title: "Address Updated" });
             } else {
-                await addAddress(values);
+                await addAddress(user.id, values);
                 toast({ title: "Address Added" });
             }
             setDialogOpen(false);
@@ -176,7 +177,7 @@ function AddressManagement({ user }: { user: ClientUser }) {
 
     const handleDelete = async (addressId: string) => {
         try {
-            await deleteAddress(addressId);
+            await deleteAddress(user.id, addressId);
             toast({ title: "Address Removed" });
         } catch (error) {
             toast({ variant: "destructive", title: "Error", description: "Failed to remove address." });
@@ -290,3 +291,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    

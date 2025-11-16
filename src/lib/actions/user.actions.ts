@@ -70,9 +70,7 @@ async function createSession(userId: string) {
   });
 }
 
-export async function getUserFromSession(): Promise<IUser | null> {
-    const cookieStore = cookies();
-    const token = cookieStore.get(COOKIE_NAME)?.value;
+export async function getUserFromSession(token?: string): Promise<IUser | null> {
     if (!token) return null;
 
     try {
@@ -300,7 +298,8 @@ export async function updateUserProfile(formData: FormData) {
 
 export async function addAddress(addressData: unknown) {
     await dbConnect();
-    const user = await getUserFromSession();
+    const token = cookies().get(COOKIE_NAME)?.value;
+    const user = await getUserFromSession(token);
     if (!user) throw new Error("You must be logged in.");
 
     const result = addressSchema.safeParse(addressData);
@@ -319,7 +318,8 @@ export async function addAddress(addressData: unknown) {
 
 export async function updateAddress(addressId: string, addressData: unknown) {
     await dbConnect();
-    const user = await getUserFromSession();
+    const token = cookies().get(COOKIE_NAME)?.value;
+    const user = await getUserFromSession(token);
     if (!user) throw new Error("You must be logged in.");
     
     const result = addressSchema.safeParse(addressData);
@@ -342,7 +342,8 @@ export async function updateAddress(addressId: string, addressData: unknown) {
 
 export async function deleteAddress(addressId: string) {
     await dbConnect();
-    const user = await getUserFromSession();
+    const token = cookies().get(COOKIE_NAME)?.value;
+    const user = await getUserFromSession(token);
     if (!user) throw new Error("You must be logged in.");
 
     await User.updateOne(
@@ -415,4 +416,3 @@ export async function deleteUserPermanently(userId: string) {
 
     revalidatePath('/admin/customers');
 }
-

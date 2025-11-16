@@ -59,8 +59,10 @@ const UserSchema: Schema = new Schema({
 
 UserSchema.pre('save', function(this: IUser, next) {
     // Only validate auth method for non-guest users
-    if (!this.isGuest && !this.password && !this.googleId && !this.phone) {
+    if (!this.isGuest) {
+      if (!this.password && !this.googleId && !this.phone) {
         return next(new Error('Authentication method (password, google, or phone) is required for non-guest users.'));
+      }
     }
     
     // Ensure there is only one default address
@@ -78,4 +80,3 @@ UserSchema.pre('save', function(this: IUser, next) {
 });
 
 export default models.User || model<IUser>('User', UserSchema);
-

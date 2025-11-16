@@ -10,11 +10,13 @@ import {
   parsePhoneNumber,
 } from 'libphonenumber-js';
 import PhoneInputWithCountry, {
-  CountrySelectorProps,
-  Flag,
-  isCountry,
   usePhoneInput,
 } from 'react-phone-number-input/react-hook-form';
+import type {
+  CountrySelectorProps,
+} from 'react-phone-number-input';
+import Flag from 'react-phone-number-input/flags'
+
 import 'react-phone-number-input/style.css';
 import { cn } from '@/lib/utils';
 import { Button } from './button';
@@ -26,7 +28,7 @@ import {
   CommandItem,
   CommandList,
 } from './command';
-import { Input, type InputProps } from './input';
+import { Input } from './input';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 import { ScrollArea } from './scroll-area';
 import { Control, FieldValues, Path, PathValue } from 'react-hook-form';
@@ -214,7 +216,6 @@ const CustomCountrySelector = ({
               <CommandEmpty>No country found.</CommandEmpty>
               <CommandGroup>
                 {countries.map((c) => {
-                  if (!isCountry(c)) return null;
                   return (
                     <CommandItem
                       key={c}

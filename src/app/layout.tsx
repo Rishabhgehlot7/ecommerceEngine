@@ -11,8 +11,9 @@ import { getSettings } from '@/lib/actions/setting.actions';
 import { getAllCategories } from '@/lib/actions/category.actions';
 import { ThemeProvider } from '@/components/theme-provider';
 import Script from 'next/script';
-import { hexToHsl } from '@/lib/utils';
 import { SettingsProvider } from '@/hooks/use-settings';
+import ThemeInjector from '@/components/theme-injector';
+
 
 export const metadata: Metadata = {
   title: 'BlueCart',
@@ -26,8 +27,6 @@ export default async function RootLayout({
 }>) {
   const settings = await getSettings();
   const categories = await getAllCategories();
-  const primaryColorLightHsl = hexToHsl(settings.primaryColor);
-  const primaryColorDarkHsl = hexToHsl(settings.primaryColorDark);
 
   return (
     <html lang="en" className={cn("h-full")} suppressHydrationWarning>
@@ -36,16 +35,6 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@500;700&display=swap" rel="stylesheet" />
-        <style id="theme-variables" dangerouslySetInnerHTML={{__html: `
-          :root { 
-            --primary-light: hsl(${primaryColorLightHsl});
-            --primary-light-hsl: ${primaryColorLightHsl};
-            --primary-dark: hsl(${primaryColorDarkHsl});
-            --primary-dark-hsl: ${primaryColorDarkHsl};
-            --font-body: 'Inter', sans-serif;
-            --font-headline: 'Poppins', sans-serif;
-          }
-        `}} />
       </head>
       <body className={cn('h-full font-body antialiased')}>
         <ThemeProvider
@@ -53,7 +42,8 @@ export default async function RootLayout({
           defaultTheme={settings.theme}
           enableSystem
         >
-          <SettingsProvider settings={settings} categories={categories}>
+          <SettingsProvider initialSettings={settings} initialCategories={categories}>
+            <ThemeInjector />
             <AuthProvider>
               <WishlistProvider>
                 <CartProvider>

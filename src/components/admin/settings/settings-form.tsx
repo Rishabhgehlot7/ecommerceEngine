@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import type { ISettings } from '@/models/Setting';
-import { updateSettings } from '@/lib/actions/setting.actions';
+import { updateSettings as updateSettingsAction } from '@/lib/actions/setting.actions';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import ImageDropzone from '../image-dropzone';
@@ -39,6 +39,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { isValidPhoneNumber } from 'libphonenumber-js';
+import { useSettings } from '@/hooks/use-settings';
 
 
 const phoneSchema = z.string().refine((value) => {
@@ -71,6 +72,7 @@ const predefinedThemes = [
 
 export default function SettingsForm({ settings }: { settings: ISettings }) {
   const { toast } = useToast();
+  const { updateSettings } = useSettings();
   const [storeLoading, setStoreLoading] = useState(false);
   const [appearanceLoading, setAppearanceLoading] = useState(false);
   
@@ -104,7 +106,8 @@ export default function SettingsForm({ settings }: { settings: ISettings }) {
     }
     
     try {
-        await updateSettings(formData);
+        await updateSettingsAction(formData);
+        updateSettings(values);
         toast({
             title: "Store Settings Updated",
             description: "Your store details have been saved.",
@@ -130,7 +133,15 @@ export default function SettingsForm({ settings }: { settings: ISettings }) {
     formData.set('primaryColorDark', primaryColorDark);
 
     try {
-        await updateSettings(formData);
+        await updateSettingsAction(formData);
+        updateSettings({
+          logoUrl: (formData.get('logo') as File)?.size > 0 ? URL.createObjectURL(formData.get('logo') as File) : (formData.get('currentImage') as string || ''),
+          primaryColor,
+          primaryColorDark,
+          theme: formData.get('theme') as 'light' | 'dark' | 'system',
+          font: formData.get('font') as string
+        });
+
         toast({
             title: "Appearance Updated",
             description: "Your appearance settings have been saved.",

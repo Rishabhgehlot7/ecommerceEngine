@@ -6,10 +6,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function hexToHsl(hex: string): string {
+export function hexToHsl(hex: string): { hsl: string; luminance: number } {
   if (!hex || typeof hex !== 'string') {
     // Return a default or fallback color
-    return '221 83% 53%';
+    return { hsl: '221 83% 53%', luminance: 0.5 };
   }
   
   // Remove the hash at the start if it's there
@@ -20,9 +20,13 @@ export function hexToHsl(hex: string): string {
     hex = hex.split('').map(char => char + char).join('');
   }
 
-  const r = parseInt(hex.substring(0, 2), 16) / 255;
-  const g = parseInt(hex.substring(2, 4), 16) / 255;
-  const b = parseInt(hex.substring(4, 6), 16) / 255;
+  const r_val = parseInt(hex.substring(0, 2), 16);
+  const g_val = parseInt(hex.substring(2, 4), 16);
+  const b_val = parseInt(hex.substring(4, 6), 16);
+
+  const r = r_val / 255;
+  const g = g_val / 255;
+  const b = b_val / 255;
 
   const max = Math.max(r, g, b);
   const min = Math.min(r, g, b);
@@ -42,6 +46,9 @@ export function hexToHsl(hex: string): string {
   h = Math.round(h * 360);
   s = Math.round(s * 100);
   l = Math.round(l * 100);
+  
+  // Calculate luminance
+  const luminance = (0.299 * r_val + 0.587 * g_val + 0.114 * b_val) / 255;
 
-  return `${h} ${s}% ${l}%`;
+  return { hsl: `${h} ${s}% ${l}%`, luminance };
 }

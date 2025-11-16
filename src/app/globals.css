@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,25 +11,28 @@
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
+    --muted: 215 28% 93%;
+    --muted-foreground: 222 47% 11%;
+
+    /* HSL values set by ThemeInjector, with fallbacks */
+    --primary-hsl: 221 83% 53%; 
+    --primary-foreground-hsl: 210 40% 98%;
     
-    --primary: var(--primary-light);
-    --primary-foreground: 210 40% 98%;
+    --primary: hsl(var(--primary-hsl));
+    --primary-foreground: hsl(var(--primary-foreground-hsl));
     
-    --secondary: hsl(var(--primary-light-hsl));
-    --secondary-foreground: 210 40% 98%;
+    --secondary: hsl(var(--primary-hsl) / 0.9);
+    --secondary-foreground: hsl(var(--primary-foreground-hsl));
     
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 28% 45%;
-    
-    --accent: hsl(var(--primary-light-hsl) / 0.15);
-    --accent-foreground: 222 47% 11%;
+    --accent: hsl(var(--primary-hsl) / 0.15);
+    --accent-foreground: hsl(var(--primary-foreground-hsl));
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
     
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: var(--primary-light);
+    --ring: hsl(var(--primary-hsl));
     
     --radius: 0.75rem;
     
@@ -46,25 +50,28 @@
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
+    --muted: 217 33% 25%;
+    --muted-foreground: 210 40% 98%;
     
-    --primary: var(--primary-dark);
-    --primary-foreground: 222 47% 11%;
+    /* HSL values set by ThemeInjector, with fallbacks */
+    --primary-hsl: 217 91% 60%;
+    --primary-foreground-hsl: 210 40% 98%;
+    
+    --primary: hsl(var(--primary-hsl));
+    --primary-foreground: hsl(var(--primary-foreground-hsl));
 
-    --secondary: hsl(var(--primary-dark-hsl));
-    --secondary-foreground: 222 47% 11%;
+    --secondary: hsl(var(--primary-hsl) / 0.9);
+    --secondary-foreground: hsl(var(--primary-foreground-hsl));
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: hsl(var(--primary-dark-hsl) / 0.25);
-    --accent-foreground: 210 40% 98%;
+    --accent: hsl(var(--primary-hsl) / 0.15);
+    --accent-foreground: hsl(var(--primary-foreground-hsl));
     
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
     
     --border: 217 33% 25%;
     --input: 217 33% 25%;
-    --ring: var(--primary-dark);
+    --ring: hsl(var(--primary-hsl));
 
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -80,6 +87,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
   }
   h1,
   h2,

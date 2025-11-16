@@ -19,17 +19,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
 import { getAllCategories } from '@/lib/actions/category.actions';
 import { getProducts } from '@/lib/actions/product.actions';
 import type { ICategory } from '@/models/Category';
 import type { IProduct } from '@/models/Product';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
+import { Filter } from 'lucide-react';
+import ShopFilters from '@/components/shop/shop-filters';
 
 export default function ShopPage() {
   const [allProducts, setAllProducts] = useState<IProduct[]>([]);
@@ -126,7 +125,7 @@ export default function ShopPage() {
                 <Skeleton className="h-10 w-1/3" />
             </div>
              <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-                <aside className="md:col-span-1">
+                <aside className="hidden md:block md:col-span-1">
                      <Skeleton className="h-8 w-1/2 mb-4" />
                      <Skeleton className="h-64 w-full rounded-lg" />
                 </aside>
@@ -152,6 +151,19 @@ export default function ShopPage() {
     )
   }
 
+  const filterProps = {
+    allCategories,
+    selectedCategories,
+    handleCategoryChange,
+    priceRange,
+    setPriceRange,
+    minPrice,
+    maxPrice,
+    onSaleOnly,
+    setOnSaleOnly,
+    formatPrice,
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
       <Breadcrumb className="mb-8">
@@ -173,52 +185,8 @@ export default function ShopPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-        <aside className="md:col-span-1">
-          <h2 className="text-2xl font-bold mb-4">Filters</h2>
-          <div className="space-y-6 rounded-lg border bg-card p-4 text-card-foreground shadow-sm">
-             <Accordion type="multiple" defaultValue={['category', 'price']} className="w-full">
-                <AccordionItem value="category">
-                  <AccordionTrigger className="text-base font-semibold">Category</AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-2 pt-2">
-                      {allCategories.map(cat => (
-                        <div key={cat._id} className="flex items-center space-x-2">
-                          <Checkbox 
-                            id={`cat-${cat._id}`}
-                            checked={selectedCategories.includes(cat._id)}
-                            onCheckedChange={() => handleCategoryChange(cat._id)}
-                          />
-                          <Label htmlFor={`cat-${cat._id}`} className="font-normal">{cat.name}</Label>
-                        </div>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="price">
-                   <AccordionTrigger className="text-base font-semibold">Price Range</AccordionTrigger>
-                   <AccordionContent>
-                    <div className="pt-2">
-                        <div className="my-3 text-sm text-muted-foreground">
-                            {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
-                        </div>
-                        <Slider
-                            min={minPrice}
-                            max={maxPrice}
-                            step={1}
-                            value={priceRange}
-                            onValueChange={(value) => setPriceRange(value)}
-                            minStepsBetweenThumbs={1}
-                        />
-                    </div>
-                   </AccordionContent>
-                </AccordionItem>
-            </Accordion>
-            <Separator/>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="sale-only" className="font-semibold">On Sale Only</Label>
-              <Switch id="sale-only" checked={onSaleOnly} onCheckedChange={setOnSaleOnly} />
-            </div>
-          </div>
+        <aside className="hidden md:block md:col-span-1">
+          <ShopFilters {...filterProps} />
         </aside>
 
         <main className="md:col-span-3">
@@ -227,22 +195,39 @@ export default function ShopPage() {
               Showing {filteredAndSortedProducts.length} products
             </p>
             <div className="flex items-center gap-2">
-                <Label htmlFor="sort-by">Sort by:</Label>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger id="sort-by" className="w-[180px]">
-                        <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                        <SelectItem value="price-desc">Price: High to Low</SelectItem>
-                        <SelectItem value="name-asc">Name: A to Z</SelectItem>
-                        <SelectItem value="name-desc">Name: Z to A</SelectItem>
-                    </SelectContent>
-                </Select>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon" className="md:hidden">
+                    <Filter className="h-4 w-4"/>
+                    <span className="sr-only">Filters</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>Filters</SheetTitle>
+                  </SheetHeader>
+                  <div className="py-4">
+                    <ShopFilters {...filterProps} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              <Label htmlFor="sort-by" className="hidden sm:block">Sort by:</Label>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger id="sort-by" className="w-auto sm:w-[180px]">
+                      <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                      <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                      <SelectItem value="name-asc">Name: A to Z</SelectItem>
+                      <SelectItem value="name-desc">Name: Z to A</SelectItem>
+                  </SelectContent>
+              </Select>
             </div>
           </div>
           {filteredAndSortedProducts.length > 0 ? (
-            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-8">
               {filteredAndSortedProducts.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}

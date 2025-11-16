@@ -34,20 +34,20 @@ export default {
           foreground: 'hsl(var(--popover-foreground))',
         },
         primary: {
-          DEFAULT: 'var(--primary)',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: 'hsl(var(--primary-hsl))',
+          foreground: 'hsl(var(--primary-foreground-hsl))',
         },
         secondary: {
-          DEFAULT: 'var(--secondary)',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: 'hsl(var(--primary-hsl) / 0.9)',
+          foreground: 'hsl(var(--primary-foreground-hsl))',
         },
         muted: {
           DEFAULT: 'hsl(var(--muted))',
           foreground: 'hsl(var(--muted-foreground))',
         },
         accent: {
-          DEFAULT: 'var(--accent)',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: 'hsl(var(--primary-hsl) / 0.15)',
+          foreground: 'hsl(var(--primary-foreground-hsl))',
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
@@ -55,7 +55,7 @@ export default {
         },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
-        ring: 'var(--ring)',
+        ring: 'hsl(var(--primary-hsl))',
         chart: {
           '1': 'hsl(var(--chart-1))',
           '2': 'hsl(var(--chart-2))',

@@ -106,11 +106,13 @@ function MainNav({ categories }: { categories: ICategory[] }) {
                     <h4 className="text-lg font-bold">New Arrivals</h4>
                     <p className="mt-1 text-sm text-muted-foreground">The latest trends and styles, updated daily.</p>
                  </div>
-                 <Button variant="outline" asChild className="mt-4 w-full">
-                  <Link href="/shop">
-                    Shop All Products <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
+                 <div className="pt-4">
+                    <Button variant="outline" asChild className="w-full">
+                    <Link href="/shop">
+                        Shop All Products <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                    </Button>
+                 </div>
               </div>
             </div>
           </NavigationMenuContent>

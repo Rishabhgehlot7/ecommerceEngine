@@ -4,6 +4,7 @@
 import dbConnect from '../db';
 import Order, { type IOrder, OrderItem, IOrderItem } from '@/models/Order';
 import Product from '@/models/Product';
+import User from '@/models/User';
 import { getUserFromSession } from './user.actions';
 import Razorpay from 'razorpay';
 import shortid from 'shortid';
@@ -34,14 +35,51 @@ interface CreateOrderPayload {
     originalAmount: number;
     discountAmount: number;
     couponCode?: string;
+    saveAddress?: boolean;
 }
 
 export async function createOrder(payload: CreateOrderPayload) {
     await dbConnect();
-    const user = await getUserFromSession();
+    let user = await getUserFromSession();
 
+    const { shippingAddress, saveAddress } = payload;
+    
     if (!user) {
-        throw new Error('You must be logged in to create an order.');
+      // Handle guest user
+      const { email, name, phone } = shippingAddress;
+      const [firstName, ...lastNameParts] = name.split(' ');
+      const lastName = lastNameParts.join(' ') || firstName;
+      
+      let guestUser = await User.findOne({ $or: [{ email }, { phone }] });
+
+      if (!guestUser) {
+        guestUser = new User({
+          email,
+          phone,
+          firstName,
+          lastName,
+          isGuest: true,
+        });
+        await guestUser.save();
+      }
+      user = guestUser;
+    }
+
+    if (user && saveAddress) {
+        const dbUser = await User.findById(user._id);
+        if (dbUser) {
+            // Check if address already exists
+            const addressExists = dbUser.addresses.some(
+                (addr) =>
+                addr.address === shippingAddress.address &&
+                addr.zip === shippingAddress.zip
+            );
+            if (!addressExists) {
+                dbUser.addresses.push({ ...shippingAddress, isDefault: dbUser.addresses.length === 0 });
+                await dbUser.save();
+                revalidatePath('/profile');
+            }
+        }
     }
     
     // Create OrderItems first
@@ -99,25 +137,31 @@ export async function verifyPayment(data: {
     
     const isVerified = expectedSignature === data.razorpay_signature;
 
+    let order;
     if (isVerified) {
-        await Order.findOneAndUpdate(
+        order = await Order.findOneAndUpdate(
             { razorpayOrderId: data.razorpay_order_id },
             {
                 status: 'Paid',
                 razorpayPaymentId: data.razorpay_payment_id,
                 razorpaySignature: data.razorpay_signature,
-            }
+            },
+            { new: true } // Return the updated document
         );
     } else {
-        await Order.findOneAndUpdate(
+        order = await Order.findOneAndUpdate(
             { razorpayOrderId: data.razorpay_order_id },
-            { status: 'Failed' }
+            { status: 'Failed' },
+            { new: true }
         );
     }
     
     revalidatePath('/admin/orders');
 
-    return { isVerified };
+    return { 
+        isVerified,
+        orderId: order?.orderId 
+    };
 }
 
 export async function getOrders(): Promise<IOrder[]> {

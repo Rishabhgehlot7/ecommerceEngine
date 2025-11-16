@@ -18,6 +18,8 @@ export default function ThemeInjector() {
     const fontHeadline = settings.font === 'poppins' ? "'Poppins', sans-serif" : "'Poppins', sans-serif";
     
     // Determine foreground color based on luminance
+    // If luminance > 0.5, the color is light, so we need dark text.
+    // Otherwise, the color is dark, so we need light text.
     const lightForegroundHsl = lightLuminance > 0.5 ? '222 47% 11%' : '210 40% 98%';
     const darkForegroundHsl = darkLuminance > 0.5 ? '222 47% 11%' : '210 40% 98%';
 
@@ -31,7 +33,7 @@ export default function ThemeInjector() {
         --font-headline: ${fontHeadline};
       }
       .dark {
-        --primary-dark-hsl: ${primaryColorDarkHsl};
+        --primary-hsl: ${primaryColorDarkHsl};
         --primary-foreground-hsl: ${darkForegroundHsl};
       }
     `;

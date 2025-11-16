@@ -12,6 +12,9 @@ export default function ThemeInjector() {
     const primaryColorLightHsl = hexToHsl(settings.primaryColor);
     const primaryColorDarkHsl = hexToHsl(settings.primaryColorDark);
 
+    const fontBody = settings.font === 'poppins' ? "'Poppins', sans-serif" : "'Inter', sans-serif";
+    const fontHeadline = settings.font === 'poppins' ? "'Poppins', sans-serif" : "'Poppins', sans-serif";
+
     const style = document.createElement('style');
     style.id = 'theme-variables';
     style.innerHTML = `
@@ -20,8 +23,8 @@ export default function ThemeInjector() {
         --primary-light-hsl: ${primaryColorLightHsl};
         --primary-dark: hsl(${primaryColorDarkHsl});
         --primary-dark-hsl: ${primaryColorDarkHsl};
-        --font-body: 'Inter', sans-serif;
-        --font-headline: 'Poppins', sans-serif;
+        --font-body: ${fontBody};
+        --font-headline: ${fontHeadline};
       }
     `;
 
@@ -32,7 +35,7 @@ export default function ThemeInjector() {
     }
 
     document.head.appendChild(style);
-  }, [settings.primaryColor, settings.primaryColorDark]);
+  }, [settings.primaryColor, settings.primaryColorDark, settings.font]);
 
   return null;
 }

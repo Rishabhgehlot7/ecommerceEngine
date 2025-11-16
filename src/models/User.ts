@@ -12,6 +12,8 @@ export interface IUser extends Document {
   role: mongoose.Types.ObjectId | IRole;
   googleId?: string;
   isGuest?: boolean;
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +27,8 @@ const UserSchema: Schema = new Schema({
   role: { type: Schema.Types.ObjectId, ref: 'Role', required: false },
   googleId: { type: String, unique: true, sparse: true },
   isGuest: { type: Boolean, default: false },
+  passwordResetToken: { type: String, select: false },
+  passwordResetExpires: { type: Date, select: false },
 }, { timestamps: true });
 
 UserSchema.pre('save', function(next) {

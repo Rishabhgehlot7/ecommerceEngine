@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -67,7 +68,15 @@ export function LoginForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <div className="flex items-center">
+                  <FormLabel>Password</FormLabel>
+                  <Link
+                    href="/forgot-password"
+                    className="ml-auto inline-block text-sm underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
                 <div className="relative">
                   <FormControl>
                     <Input type={showPassword ? 'text' : 'password'} {...field} />

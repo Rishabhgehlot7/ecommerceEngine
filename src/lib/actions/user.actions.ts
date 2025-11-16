@@ -10,6 +10,8 @@ import { cookies } from 'next/headers';
 import { sign, verify } from 'jsonwebtoken';
 import { revalidatePath } from 'next/cache';
 import { uploadFile } from '../s3';
+import crypto from 'crypto';
+import { sendPasswordResetEmail } from '../mail';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key';
 const COOKIE_NAME = 'session_token';
@@ -237,4 +239,53 @@ export async function updateUserProfile(formData: FormData) {
     await user.save();
     revalidatePath('/profile');
     revalidatePath('.', 'layout'); // Revalidate layout to update UserNav avatar
+}
+
+export async function requestPasswordReset(email: string) {
+    await dbConnect();
+    const user = await User.findOne({ email, isGuest: { $ne: true } });
+
+    // We don't want to reveal if a user exists or not, so we succeed silently.
+    if (!user) {
+        return;
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await user.save();
+    
+    const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?token=${resetToken}`;
+    
+    try {
+        await sendPasswordResetEmail(user.email, resetUrl);
+    } catch (error) {
+        console.error('Failed to send password reset email:', error);
+        // Don't throw to the client, but handle internally
+        throw new Error('Could not send reset email. Please try again later.');
+    }
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
+    await dbConnect();
+
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await User.findOne({
+        passwordResetToken: hashedToken,
+        passwordResetExpires: { $gt: Date.now() },
+    }).select('+password');
+
+    if (!user) {
+        throw new Error('Password reset token is invalid or has expired.');
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    // Log the user in after password reset
+    await createSession(user._id);
 }

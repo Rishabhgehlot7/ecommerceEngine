@@ -1,4 +1,5 @@
 
+
 import mongoose, { Schema, Document, models, model } from 'mongoose';
 import { IRole } from './Role';
 
@@ -56,9 +57,10 @@ const UserSchema: Schema = new Schema({
   addresses: [AddressSchema],
 }, { timestamps: true });
 
-UserSchema.pre('save', function(next) {
-    if (!this.password && !this.googleId && !this.phone && !this.isGuest) {
-        return next(new Error('Authentication method (password, google, or phone) is required.'));
+UserSchema.pre('save', function(this: IUser, next) {
+    // Only validate auth method for non-guest users
+    if (!this.isGuest && !this.password && !this.googleId && !this.phone) {
+        return next(new Error('Authentication method (password, google, or phone) is required for non-guest users.'));
     }
     
     // Ensure there is only one default address
@@ -76,3 +78,4 @@ UserSchema.pre('save', function(next) {
 });
 
 export default models.User || model<IUser>('User', UserSchema);
+

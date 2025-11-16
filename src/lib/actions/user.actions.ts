@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import dbConnect from '../db';
@@ -70,7 +71,8 @@ async function createSession(userId: string) {
 }
 
 export async function getUserFromSession(): Promise<IUser | null> {
-    const token = cookies().get(COOKIE_NAME)?.value;
+    const cookieStore = cookies();
+    const token = cookieStore.get(COOKIE_NAME)?.value;
     if (!token) return null;
 
     try {
@@ -413,3 +415,4 @@ export async function deleteUserPermanently(userId: string) {
 
     revalidatePath('/admin/customers');
 }
+

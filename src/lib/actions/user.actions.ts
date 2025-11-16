@@ -72,13 +72,9 @@ async function createSession(userId: string) {
 
 export async function getUserFromSession(token?: string): Promise<IUser | null> {
     if (!token) {
-        // Fallback to reading from cookies if no token is passed (for server-side rendering)
-        const cookieStore = cookies();
-        token = cookieStore.get(COOKIE_NAME)?.value;
+        return null;
     }
     
-    if (!token) return null;
-
     try {
         const decoded = verify(token, JWT_SECRET) as { userId: string };
         await dbConnect();
@@ -279,8 +275,10 @@ export async function updateUserProfile(formData: FormData) {
     const lastName = formData.get('lastName') as string;
     if (lastName) user.lastName = lastName;
 
-    const phone = formData.get('phone') as string;
-    if (phone) user.phone = phone;
+    const phone = formData.get('phone') as string | null;
+    if (phone) {
+        user.phone = phone;
+    }
     
     const currentPassword = formData.get('currentPassword') as string;
     const newPassword = formData.get('newPassword') as string;
@@ -296,7 +294,7 @@ export async function updateUserProfile(formData: FormData) {
     if (avatarFile && avatarFile.size > 0) {
         const avatarUrl = await uploadImage(avatarFile);
         if(avatarUrl) user.avatar = avatarUrl;
-    } else if (!formData.has('currentImage')) {
+    } else if (formData.get('avatar') === 'remove') {
         user.avatar = undefined;
     }
 

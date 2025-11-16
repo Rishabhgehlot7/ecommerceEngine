@@ -22,21 +22,54 @@ import { AddressForm } from '@/components/profile/address-form';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import type { IAddress } from '@/models/User';
 import { addressSchema } from '@/lib/schemas/address.schema';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import { cn } from '@/lib/utils';
+
+const profileFormSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  phone: z.string().refine((value) => {
+    if (!value || value.length === 0) return true;
+    return isValidPhoneNumber(value);
+  }, {
+    message: 'Invalid phone number'
+  }).optional().or(z.literal('')),
+});
 
 function ProfileForm({ user }: { user: ClientUser }) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+
+  const form = useForm<z.infer<typeof profileFormSchema>>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      phone: user.phone || '',
+    },
+  });
   
-  const handleProfileSubmit = async (data: any) => {
+  const handleProfileSubmit = async (values: z.infer<typeof profileFormSchema>) => {
     setLoading(true);
-    const formData = new FormData(data.currentTarget);
+    const formData = new FormData();
     formData.append('id', user.id);
+    formData.append('firstName', values.firstName);
+    formData.append('lastName', values.lastName);
+    if(values.phone) formData.append('phone', values.phone);
+
+    const avatarInput = document.querySelector('input[name="avatar"]') as HTMLInputElement;
+    if (avatarInput && avatarInput.files && avatarInput.files.length > 0) {
+        formData.append('avatar', avatarInput.files[0]);
+    } else if (!avatarInput.nextElementSibling) { // Heuristic: if preview is gone, image was removed.
+        formData.append('avatar', 'remove');
+    }
     
     try {
         await updateUserProfile(formData);
         toast({ title: 'Profile Updated', description: 'Your information has been saved.' });
-    } catch (error) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Failed to update profile.' });
+    } catch (error: any) {
+        toast({ variant: 'destructive', title: 'Error', description: error.message || 'Failed to update profile.' });
     } finally {
         setLoading(false);
     }
@@ -44,38 +77,73 @@ function ProfileForm({ user }: { user: ClientUser }) {
 
   return (
     <Card>
-      <form onSubmit={handleProfileSubmit}>
-        <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
-          <CardDescription>Update your name, email address and profile picture.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-            <div className="space-y-2">
-                <Label>Profile Picture</Label>
-                <ImageDropzone name="avatar" initialImage={user.avatar} />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleProfileSubmit)}>
+            <CardHeader>
+            <CardTitle>Personal Information</CardTitle>
+            <CardDescription>Update your name, email address and profile picture.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor='firstName'>First Name</Label>
-                    <Input id='firstName' name='firstName' defaultValue={user.firstName} />
+                    <Label>Profile Picture</Label>
+                    <ImageDropzone name="avatar" initialImage={user.avatar} />
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor='lastName'>Last Name</Label>
-                    <Input id='lastName' name='lastName' defaultValue={user.lastName} />
+
+                <div className="grid grid-cols-2 gap-4">
+                     <FormField
+                        control={form.control}
+                        name="firstName"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>First Name</FormLabel>
+                                <FormControl><Input {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                         <FormField
+                        control={form.control}
+                        name="lastName"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Last Name</FormLabel>
+                                <FormControl><Input {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                        />
                 </div>
-            </div>
-            <div className="space-y-2">
-                <Label>Email</Label>
-                <Input type='email' value={user.email || 'No email set'} readOnly disabled />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor='phone'>Phone</Label>
-                <Input id='phone' name='phone' type='tel' defaultValue={user.phone || ''} placeholder="Add your phone number"/>
-            </div>
-          <Button type="submit" disabled={loading}>{loading ? "Saving..." : "Save Changes"}</Button>
-        </CardContent>
-      </form>
+                <div className="space-y-2">
+                    <Label>Email</Label>
+                    <Input type='email' value={user.email || 'No email set'} readOnly disabled />
+                </div>
+                 <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Phone</FormLabel>
+                        <FormControl>
+                            <PhoneInput
+                            international
+                            defaultCountry="IN"
+                            className={cn(
+                                'flex h-10 w-full rounded-md border border-input bg-background pl-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+                                '[&_input]:border-0 [&_input]:bg-transparent [&_input]:p-0 [&_input]:focus-visible:ring-0 [&_input]:focus-visible:ring-offset-0'
+                            )}
+                            {...field}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+            </CardContent>
+             <CardFooter>
+                 <Button type="submit" disabled={loading}>{loading ? "Saving..." : "Save Changes"}</Button>
+            </CardFooter>
+        </form>
+       </Form>
     </Card>
   );
 }
@@ -183,6 +251,16 @@ function AddressManagement({ user }: { user: ClientUser }) {
             toast({ variant: "destructive", title: "Error", description: "Failed to remove address." });
         }
     };
+    
+    const openEditDialog = (address: IAddress) => {
+        setEditingAddress(address);
+        setDialogOpen(true);
+    };
+
+    const openNewDialog = () => {
+        setEditingAddress(null);
+        setDialogOpen(true);
+    }
 
     return (
         <Card>
@@ -191,20 +269,7 @@ function AddressManagement({ user }: { user: ClientUser }) {
                     <CardTitle>Address Book</CardTitle>
                     <CardDescription>Manage your saved shipping addresses.</CardDescription>
                 </div>
-                <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) setEditingAddress(null); }}>
-                    <DialogTrigger asChild>
-                        <Button variant="outline"><PlusCircle className="mr-2 h-4 w-4" /> Add New</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>{editingAddress ? 'Edit Address' : 'Add New Address'}</DialogTitle>
-                        </DialogHeader>
-                        <AddressForm 
-                            onSubmit={handleAddressAction}
-                            initialData={editingAddress || undefined}
-                        />
-                    </DialogContent>
-                </Dialog>
+                 <Button variant="outline" onClick={openNewDialog}><PlusCircle className="mr-2 h-4 w-4" /> Add New</Button>
             </CardHeader>
             <CardContent>
                 {user.addresses && user.addresses.length > 0 ? (
@@ -217,17 +282,7 @@ function AddressManagement({ user }: { user: ClientUser }) {
                                     <p className="text-muted-foreground">{address.phone}</p>
                                 </div>
                                 <div className="flex gap-2">
-                                     <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="ghost" size="icon" onClick={() => setEditingAddress(address)}><Edit className="h-4 w-4" /></Button>
-                                        </DialogTrigger>
-                                        <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle>Edit Address</DialogTitle>
-                                            </DialogHeader>
-                                            <AddressForm onSubmit={handleAddressAction} initialData={address} />
-                                        </DialogContent>
-                                    </Dialog>
+                                     <Button variant="ghost" size="icon" onClick={() => openEditDialog(address)}><Edit className="h-4 w-4" /></Button>
                                     <Button variant="ghost" size="icon" onClick={() => handleDelete(address._id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                                 </div>
                             </div>
@@ -237,6 +292,17 @@ function AddressManagement({ user }: { user: ClientUser }) {
                     <p className="text-muted-foreground text-center">No saved addresses.</p>
                 )}
             </CardContent>
+            <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) setEditingAddress(null); }}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{editingAddress ? 'Edit Address' : 'Add New Address'}</DialogTitle>
+                    </DialogHeader>
+                    <AddressForm 
+                        onSubmit={handleAddressAction}
+                        initialData={editingAddress || undefined}
+                    />
+                </DialogContent>
+            </Dialog>
         </Card>
     );
 }

@@ -26,7 +26,8 @@ export default async function RootLayout({
 }>) {
   const settings = await getSettings();
   const categories = await getAllCategories();
-  const primaryColorHsl = hexToHsl(settings.primaryColor);
+  const primaryColorLightHsl = hexToHsl(settings.primaryColor);
+  const primaryColorDarkHsl = hexToHsl(settings.primaryColorDark);
 
   return (
     <html lang="en" className={cn("h-full")} suppressHydrationWarning>
@@ -37,7 +38,8 @@ export default async function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@500;700&display=swap" rel="stylesheet" />
         <style id="theme-variables" dangerouslySetInnerHTML={{__html: `
           :root { 
-            --primary: ${primaryColorHsl};
+            --primary-light: ${primaryColorLightHsl};
+            --primary-dark: ${primaryColorDarkHsl};
             --font-body: 'Inter', sans-serif;
             --font-headline: 'Poppins', sans-serif;
           }

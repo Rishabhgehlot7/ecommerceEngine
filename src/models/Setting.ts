@@ -18,6 +18,7 @@ export interface ISettings extends Document {
   theme: 'light' | 'dark' | 'system';
   font: string;
   primaryColor: string;
+  primaryColorDark: string;
   logoUrl: string;
 }
 
@@ -38,6 +39,7 @@ const SettingsSchema: Schema = new Schema({
   theme: { type: String, enum: ['light', 'dark', 'system'], default: 'light' },
   font: { type: String, default: 'inter' },
   primaryColor: { type: String, default: '#2563eb' },
+  primaryColorDark: { type: String, default: '#60a5fa' },
   logoUrl: { type: String, default: '' },
 }, { timestamps: true });
 

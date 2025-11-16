@@ -39,7 +39,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { isValidPhoneNumber } from 'libphonenumber-js';
-import { hexToHsl } from '@/lib/utils';
 
 
 const phoneSchema = z.string().refine((value) => {
@@ -75,8 +74,9 @@ export default function SettingsForm({ settings }: { settings: ISettings }) {
   const [storeLoading, setStoreLoading] = useState(false);
   const [appearanceLoading, setAppearanceLoading] = useState(false);
   
-  // State for color picker to be controlled
+  // State for color pickers
   const [primaryColor, setPrimaryColor] = useState(settings.primaryColor || '#2563eb');
+  const [primaryColorDark, setPrimaryColorDark] = useState(settings.primaryColorDark || '#60a5fa');
 
   const storeForm = useForm<z.infer<typeof storeFormSchema>>({
     resolver: zodResolver(storeFormSchema),
@@ -126,8 +126,8 @@ export default function SettingsForm({ settings }: { settings: ISettings }) {
     setAppearanceLoading(true);
     const formData = new FormData(event.currentTarget);
 
-    // Manually set the color from state, as the color input might not be perfectly in sync
     formData.set('primaryColor', primaryColor);
+    formData.set('primaryColorDark', primaryColorDark);
 
     try {
         await updateSettings(formData);
@@ -292,41 +292,37 @@ export default function SettingsForm({ settings }: { settings: ISettings }) {
                   </div>
                   <div className="space-y-6">
                     <div>
-                      <Label>Primary Color</Label>
+                      <Label>Primary Color (Light)</Label>
                       <div className="flex items-center gap-2">
                           <Input 
-                            id="primaryColorPicker" 
                             type="color" 
                             value={primaryColor}
                             onChange={(e) => setPrimaryColor(e.target.value)}
                             className="h-10 w-14 p-1"
                           />
                           <Input 
-                            id="primaryColorText"
-                            name="primaryColor"
                             type="text" 
                             value={primaryColor}
                             onChange={(e) => setPrimaryColor(e.target.value)} 
                             className="max-w-xs" 
                           />
                       </div>
-                       <div className="mt-4">
-                        <Label className="text-sm text-muted-foreground">Predefined Themes</Label>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {predefinedThemes.map((theme) => (
-                            <button
-                              key={theme.name}
-                              type="button"
-                              className={cn(
-                                'h-8 w-8 rounded-full border-2 transition-transform hover:scale-110',
-                                primaryColor === theme.color ? 'border-ring' : 'border-transparent'
-                              )}
-                              style={{ backgroundColor: theme.color }}
-                              title={theme.name}
-                              onClick={() => setPrimaryColor(theme.color)}
-                            />
-                          ))}
-                        </div>
+                    </div>
+                     <div>
+                      <Label>Primary Color (Dark)</Label>
+                      <div className="flex items-center gap-2">
+                          <Input 
+                            type="color" 
+                            value={primaryColorDark}
+                            onChange={(e) => setPrimaryColorDark(e.target.value)}
+                            className="h-10 w-14 p-1"
+                          />
+                          <Input 
+                            type="text" 
+                            value={primaryColorDark}
+                            onChange={(e) => setPrimaryColorDark(e.target.value)} 
+                            className="max-w-xs" 
+                          />
                       </div>
                     </div>
                     <div>

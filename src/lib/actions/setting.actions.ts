@@ -5,7 +5,6 @@ import dbConnect from '../db';
 import Setting, { type ISettings } from '@/models/Setting';
 import { revalidatePath } from 'next/cache';
 import { uploadFile } from '../s3';
-import { hexToHsl } from '../utils';
 
 const defaultSettings = {
     storeName: 'BlueCart',
@@ -22,6 +21,7 @@ const defaultSettings = {
     theme: 'light',
     font: 'inter',
     primaryColor: '#2563eb',
+    primaryColorDark: '#60a5fa',
     logoUrl: '',
 };
 
@@ -47,11 +47,18 @@ export async function getSettings(): Promise<ISettings> {
         settings = (await new Setting(defaultSettings).save()).toObject();
     }
     
-    const plainSettings = JSON.parse(JSON.stringify(settings));
-    // Ensure nested objects exist for easier access on the client
+    const plainSettings: ISettings = JSON.parse(JSON.stringify(settings));
+    // Ensure nested objects and defaults exist for easier access on the client
     if (!plainSettings.socials) {
         plainSettings.socials = {};
     }
+    if (!plainSettings.primaryColor) {
+        plainSettings.primaryColor = defaultSettings.primaryColor;
+    }
+    if (!plainSettings.primaryColorDark) {
+        plainSettings.primaryColorDark = defaultSettings.primaryColorDark;
+    }
+
     return plainSettings;
 }
 
@@ -90,8 +97,6 @@ export async function updateSettings(formData: FormData) {
         updates.logoUrl = formData.get('currentImage');
     }
 
-    // Since forms are separate, we only want to update the fields present in the form.
-    // We build a dynamic update object based on what's submitted.
     const updateObject: { [key: string]: any } = {};
     Object.keys(updates).forEach(key => {
         if (key.includes('.')) {
@@ -102,16 +107,8 @@ export async function updateSettings(formData: FormData) {
             updateObject[key] = updates[key];
         }
     });
-    
-    if (updateObject.primaryColor) {
-      updateObject.primaryColor = hexToHsl(updateObject.primaryColor)
-    }
 
-
-    const settings = await Setting.findOneAndUpdate({}, { $set: updateObject }, { new: true, upsert: true, setDefaultsOnInsert: true });
+    await Setting.findOneAndUpdate({}, { $set: updateObject }, { new: true, upsert: true, setDefaultsOnInsert: true });
     
-    // Revalidate the entire site layout to reflect changes everywhere.
     revalidatePath('.', 'layout');
-
-    return JSON.parse(JSON.stringify(settings));
 }

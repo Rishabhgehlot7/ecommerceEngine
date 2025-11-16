@@ -227,7 +227,7 @@ export default function AnalyticsPage() {
              {filteredData.productsPerCategory.length > 0 ? (
                 <ChartContainer config={chartConfigPie} className="mx-auto aspect-square max-h-[250px]">
                   <PieChart>
-                    <ChartTooltip content={<ChartTooltipContent nameKey="products" hideLabel />} />
+                    <ChartTooltip content={<ChartTooltipContent nameKey="products" />} />
                     <Pie data={filteredData.productsPerCategory} dataKey="products" nameKey="name" innerRadius={60}>
                       {filteredData.productsPerCategory.map((entry) => <Cell key={`cell-${entry.name}`} fill={entry.fill} />)}
                     </Pie>
@@ -265,7 +265,7 @@ export default function AnalyticsPage() {
                  {filteredData.ordersByStatus.length > 0 ? (
                     <ChartContainer config={chartConfigPie} className="mx-auto aspect-square max-h-[250px]">
                       <PieChart>
-                        <ChartTooltip content={<ChartTooltipContent nameKey="count" hideLabel />} />
+                        <ChartTooltip content={<ChartTooltipContent nameKey="count" />} />
                         <Pie data={filteredData.ordersByStatus} dataKey="count" nameKey="name" innerRadius={60}>
                           {filteredData.ordersByStatus.map((entry) => (<Cell key={`cell-${entry.name}`} fill={entry.fill} />))}
                         </Pie>

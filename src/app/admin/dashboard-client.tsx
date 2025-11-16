@@ -45,6 +45,9 @@ const chartConfigPie = {
   products: {
     label: 'Products',
   },
+  revenue: {
+    label: 'Revenue'
+  }
 } as const;
 
 const chartConfigBar = {
@@ -275,7 +278,7 @@ export default function AdminDashboardClient({ products, users, orders, adminUse
                  {filteredData.salesPerCategory.length > 0 ? (
                     <ChartContainer config={chartConfigPie} className="mx-auto aspect-square max-h-[200px]">
                       <PieChart>
-                        <ChartTooltip content={<ChartTooltipContent nameKey="revenue" hideLabel />} />
+                        <ChartTooltip content={<ChartTooltipContent nameKey="revenue" />} />
                         <Pie data={filteredData.salesPerCategory} dataKey="revenue" nameKey="name" innerRadius={50}>
                           {filteredData.salesPerCategory.map((entry) => (
                             <Cell key={`cell-${entry.name}`} fill={entry.fill} />

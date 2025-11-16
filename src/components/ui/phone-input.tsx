@@ -6,10 +6,8 @@ import {
   Country,
   getCountryCallingCode,
 } from 'libphonenumber-js';
-import RPNInput, {
-  type PhoneInputProps as RPNInputProps,
-  type Country as RPNCountry,
-} from 'react-phone-number-input';
+import RPNInput from 'react-phone-number-input/react-hook-form';
+import type { PhoneInputProps as RPNInputProps } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import Flag from 'react-phone-number-input/flags';
 import { cn } from '@/lib/utils';
@@ -62,6 +60,8 @@ const InputComponent = React.forwardRef<HTMLInputElement, InputProps>(
 );
 InputComponent.displayName = "InputComponent";
 
+
+type RPNCountry = RPNInputProps<any>['country'];
 
 type CountrySelectorProps = {
   disabled?: boolean;

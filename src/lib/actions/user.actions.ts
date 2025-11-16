@@ -59,7 +59,7 @@ export async function getUserFromSession(): Promise<IUser | null> {
         const decoded = verify(token, JWT_SECRET) as { userId: string };
         await dbConnect();
         const user = await User.findById(decoded.userId).populate('role').lean();
-        if (!user) return null;
+        if (!user || user.isGuest) return null; // Do not consider guest users as logged in
         return JSON.parse(JSON.stringify(user));
     } catch (error) {
         console.error("Invalid token", error);
@@ -82,17 +82,32 @@ export async function signup(data: unknown) {
   await dbConnect();
 
   const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    throw new Error('User with this email already exists.');
-  }
-
   const hashedPassword = await bcrypt.hash(password, 10);
+
+  if (existingUser) {
+    if (existingUser.isGuest) {
+      // Convert guest to full user
+      existingUser.firstName = firstName;
+      existingUser.lastName = lastName;
+      existingUser.password = hashedPassword;
+      existingUser.isGuest = false;
+      await existingUser.save();
+      await createSession(existingUser._id);
+      
+      const userObject = existingUser.toObject();
+      delete userObject.password;
+      return JSON.parse(JSON.stringify(userObject));
+    } else {
+      throw new Error('User with this email already exists.');
+    }
+  }
 
   const newUser = new User({
     firstName,
     lastName,
     email,
     password: hashedPassword,
+    isGuest: false,
   });
 
   await newUser.save();
@@ -114,7 +129,7 @@ export async function login(data: unknown) {
 
     await dbConnect();
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email, isGuest: { $ne: true } }).select('+password');
     if (!user) {
         throw new Error('Invalid email or password.');
     }
@@ -135,7 +150,7 @@ export async function getUsers(): Promise<IUser[]> {
     await dbConnect();
     // Eagerly import Role model to prevent MissingSchemaError
     await Role.find({});
-    const users = await User.find({}).populate('role').sort({ createdAt: -1 }).lean();
+    const users = await User.find({ isGuest: { $ne: true } }).populate('role').sort({ createdAt: -1 }).lean();
     return JSON.parse(JSON.stringify(users));
 }
 

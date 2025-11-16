@@ -11,23 +11,25 @@ export interface IUser extends Document {
   avatar?: string;
   role: mongoose.Types.ObjectId | IRole;
   googleId?: string;
+  isGuest?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const UserSchema: Schema = new Schema({
-  firstName: { type: String, required: [true, 'First name is required.'], trim: true },
-  lastName: { type: String, required: [true, 'Last name is required.'], trim: true },
+  firstName: { type: String, required: true, trim: true },
+  lastName: { type: String, required: true, trim: true },
   email: { type: String, required: true, unique: true, index: true, lowercase: true, trim: true },
   password: { type: String, required: false, select: false }, 
   avatar: { type: String },
   role: { type: Schema.Types.ObjectId, ref: 'Role', required: false },
   googleId: { type: String, unique: true, sparse: true },
+  isGuest: { type: Boolean, default: false },
 }, { timestamps: true });
 
 UserSchema.pre('save', function(next) {
-    if (!this.password && !this.googleId) {
-        next(new Error('A password is required if not signing up with Google.'));
+    if (!this.password && !this.googleId && !this.isGuest) {
+        next(new Error('A password is required if not signing up with Google or as a guest.'));
     } else {
         next();
     }

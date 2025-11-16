@@ -4,6 +4,7 @@
 import dbConnect from '../db';
 import Order, { type IOrder, OrderItem, IOrderItem } from '@/models/Order';
 import Product from '@/models/Product';
+import User from '@/models/User';
 import { getUserFromSession } from './user.actions';
 import Razorpay from 'razorpay';
 import shortid from 'shortid';
@@ -38,10 +39,26 @@ interface CreateOrderPayload {
 
 export async function createOrder(payload: CreateOrderPayload) {
     await dbConnect();
-    const user = await getUserFromSession();
+    let user = await getUserFromSession();
 
     if (!user) {
-        throw new Error('You must be logged in to create an order.');
+      // Handle guest user
+      const { email, name } = payload.shippingAddress;
+      const [firstName, ...lastNameParts] = name.split(' ');
+      const lastName = lastNameParts.join(' ') || firstName;
+      
+      let guestUser = await User.findOne({ email: email, isGuest: true });
+
+      if (!guestUser) {
+        guestUser = new User({
+          email,
+          firstName,
+          lastName,
+          isGuest: true,
+        });
+        await guestUser.save();
+      }
+      user = guestUser;
     }
     
     // Create OrderItems first

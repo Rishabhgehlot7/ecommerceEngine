@@ -159,8 +159,7 @@ export default function AdminLayout({
             </div>
         </SidebarFooter>
       </Sidebar>
-      <main className="flex-1 bg-muted/40 relative">
-         <div className="absolute inset-0 bg-repeat bg-center" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E\")"}} />
+      <main className="flex-1 bg-muted/40">
         <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 backdrop-blur-sm px-4 sm:px-6">
           <SidebarTrigger className="sm:hidden" />
           <div className="flex-1" />
@@ -176,7 +175,7 @@ export default function AdminLayout({
              <UserNav />
            </div>
         </header>
-        <div className="relative p-4 sm:p-6 min-h-[calc(100vh-3.5rem)]">{children}</div>
+        <div className="p-4 sm:p-6">{children}</div>
       </main>
     </SidebarProvider>
   );

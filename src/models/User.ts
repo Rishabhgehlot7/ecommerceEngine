@@ -23,6 +23,7 @@ export interface IUser extends Document {
   role?: mongoose.Types.ObjectId | IRole;
   googleId?: string;
   isGuest?: boolean;
+  isDeleted: boolean;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
   addresses: IAddress[];
@@ -49,6 +50,7 @@ const UserSchema: Schema = new Schema({
   role: { type: Schema.Types.ObjectId, ref: 'Role', required: false },
   googleId: { type: String, unique: true, sparse: true },
   isGuest: { type: Boolean, default: false },
+  isDeleted: { type: Boolean, default: false, index: true },
   passwordResetToken: { type: String, select: false },
   passwordResetExpires: { type: Date, select: false },
   addresses: [AddressSchema],

@@ -6,7 +6,6 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from '@/components/ui/card';
 import {
   Table,
@@ -17,20 +16,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { MoreHorizontal } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { getUsers } from '@/lib/actions/user.actions';
 import type { IUser } from '@/models/User';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import type { IRole } from '@/models/Role';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import UserActions from './user-actions';
 
 function CustomerCard({ user }: { user: IUser }) {
   const role = user.role as IRole | null;
@@ -45,29 +37,16 @@ function CustomerCard({ user }: { user: IUser }) {
           <CardTitle className="text-lg">{user.firstName} {user.lastName}</CardTitle>
           <p className="text-sm text-muted-foreground">{user.email || user.phone}</p>
         </div>
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button aria-haspopup="true" size="icon" variant="ghost">
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Toggle menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem asChild>
-                <Link href={`/admin/customers/${user._id}/edit`}>Edit</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem disabled>View Orders</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <UserActions user={user} />
       </CardHeader>
        <CardFooter className="gap-2">
-          {user.isGuest && <Badge variant="destructive">Guest</Badge>}
+          {user.isGuest && <Badge variant="secondary">Guest</Badge>}
           {role ? (
-            <Badge variant="secondary">{role.name}</Badge>
+            <Badge variant="outline">{role.name}</Badge>
           ) : !user.isGuest && (
             <span className="text-sm text-muted-foreground">No Role</span>
           )}
+          {user.isDeleted && <Badge variant="destructive">Deleted</Badge>}
         </CardFooter>
     </Card>
   )
@@ -75,7 +54,9 @@ function CustomerCard({ user }: { user: IUser }) {
 
 
 export default async function AdminCustomersPage() {
-  const users = await getUsers();
+  const users = await getUsers(true);
+  const activeUsers = users.filter(u => !u.isDeleted);
+  const deletedUsers = users.filter(u => u.isDeleted);
 
   return (
     <div className="space-y-6">
@@ -86,91 +67,150 @@ export default async function AdminCustomersPage() {
         </div>
       </div>
       
-      {/* Mobile View */}
-      <div className="grid gap-4 md:hidden">
-        {users.map((user) => (
-          <CustomerCard key={user._id} user={user} />
-        ))}
-         {users.length === 0 && (
-            <Card className="flex items-center justify-center p-10">
-                <p className="text-muted-foreground">No customers found.</p>
-            </Card>
-        )}
-      </div>
-
-      {/* Desktop View */}
-      <div className="hidden md:block">
-        <Card>
-          <CardHeader>
-            <CardTitle>Customer List</CardTitle>
-            <CardDescription>
-              A list of all registered users in your store.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>
-                    <span className="sr-only">Actions</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users && users.map((user: IUser) => (
-                  <TableRow key={user._id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={user.avatar} alt={`${user.firstName} ${user.lastName}`} />
-                          <AvatarFallback>{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <span>{user.firstName} {user.lastName}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{user.email || user.phone}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                          {user.isGuest && <Badge variant="destructive">Guest</Badge>}
-                          {user.role ? (
-                            <Badge variant="secondary">{(user.role as IRole).name}</Badge>
-                          ) : !user.isGuest && (
-                            <span className="text-muted-foreground">No Role</span>
-                          )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button aria-haspopup="true" size="icon" variant="ghost">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem asChild>
-                            <Link href={`/admin/customers/${user._id}/edit`}>Edit</Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem disabled>View Orders</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
+       <Tabs defaultValue="active">
+        <TabsList>
+          <TabsTrigger value="active">Active ({activeUsers.length})</TabsTrigger>
+          <TabsTrigger value="deleted">Deleted ({deletedUsers.length})</TabsTrigger>
+        </TabsList>
+        <TabsContent value="active" className="mt-4">
+            {/* Mobile View */}
+            <div className="grid gap-4 md:hidden">
+                {activeUsers.map((user) => (
+                <CustomerCard key={user._id} user={user} />
                 ))}
-              </TableBody>
-            </Table>
-            {(!users || users.length === 0) && (
-                <div className="py-10 text-center text-muted-foreground">
-                  No customers found.
-                </div>
-              )}
-          </CardContent>
-        </Card>
-      </div>
+                {activeUsers.length === 0 && (
+                    <Card className="flex items-center justify-center p-10">
+                        <p className="text-muted-foreground">No active customers found.</p>
+                    </Card>
+                )}
+            </div>
+             {/* Desktop View */}
+            <div className="hidden md:block">
+                <Card>
+                <CardHeader>
+                    <CardTitle>Active Customers</CardTitle>
+                    <CardDescription>
+                    A list of all active users in your store.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                    <TableHeader>
+                        <TableRow>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Contact</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>
+                            <span className="sr-only">Actions</span>
+                        </TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {activeUsers.length > 0 ? activeUsers.map((user: IUser) => (
+                        <TableRow key={user._id}>
+                            <TableCell className="font-medium">
+                            <div className="flex items-center gap-3">
+                                <Avatar className="h-8 w-8">
+                                <AvatarImage src={user.avatar} alt={`${user.firstName} ${user.lastName}`} />
+                                <AvatarFallback>{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <span>{user.firstName} {user.lastName}</span>
+                            </div>
+                            </TableCell>
+                            <TableCell>{user.email || user.phone}</TableCell>
+                            <TableCell>
+                            <div className="flex items-center gap-2">
+                                {user.isGuest && <Badge variant="secondary">Guest</Badge>}
+                                {user.role ? (
+                                    <Badge variant="outline">{(user.role as IRole).name}</Badge>
+                                ) : !user.isGuest && (
+                                    <span className="text-muted-foreground">No Role</span>
+                                )}
+                            </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                                <UserActions user={user} />
+                            </TableCell>
+                        </TableRow>
+                        )) : (
+                             <TableRow><TableCell colSpan={4} className="h-24 text-center">No active customers found.</TableCell></TableRow>
+                        )}
+                    </TableBody>
+                    </Table>
+                </CardContent>
+                </Card>
+            </div>
+        </TabsContent>
+        <TabsContent value="deleted" className="mt-4">
+            {/* Mobile View */}
+            <div className="grid gap-4 md:hidden">
+                {deletedUsers.map((user) => (
+                <CustomerCard key={user._id} user={user} />
+                ))}
+                {deletedUsers.length === 0 && (
+                    <Card className="flex items-center justify-center p-10">
+                        <p className="text-muted-foreground">No deleted customers found.</p>
+                    </Card>
+                )}
+            </div>
+            {/* Desktop View */}
+            <div className="hidden md:block">
+                <Card>
+                <CardHeader>
+                    <CardTitle>Deleted Customers</CardTitle>
+                    <CardDescription>
+                    A list of all deleted users from your store.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                     <TableHeader>
+                        <TableRow>
+                        <TableHead>Customer</TableHead>
+                        <TableHead>Contact</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>
+                            <span className="sr-only">Actions</span>
+                        </TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {deletedUsers.length > 0 ? deletedUsers.map((user: IUser) => (
+                        <TableRow key={user._id}>
+                            <TableCell className="font-medium">
+                            <div className="flex items-center gap-3">
+                                <Avatar className="h-8 w-8">
+                                <AvatarImage src={user.avatar} alt={`${user.firstName} ${user.lastName}`} />
+                                <AvatarFallback>{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <span>{user.firstName} {user.lastName}</span>
+                            </div>
+                            </TableCell>
+                            <TableCell>{user.email || user.phone}</TableCell>
+                            <TableCell>
+                            <div className="flex items-center gap-2">
+                                {user.isGuest && <Badge variant="secondary">Guest</Badge>}
+                                {user.role ? (
+                                    <Badge variant="outline">{(user.role as IRole).name}</Badge>
+                                ) : !user.isGuest && (
+                                    <span className="text-muted-foreground">No Role</span>
+                                )}
+                            </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                                <UserActions user={user} />
+                            </TableCell>
+                        </TableRow>
+                        )) : (
+                            <TableRow><TableCell colSpan={4} className="h-24 text-center">No deleted customers found.</TableCell></TableRow>
+                        )}
+                    </TableBody>
+                    </Table>
+                </CardContent>
+                </Card>
+            </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

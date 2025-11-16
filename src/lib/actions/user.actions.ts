@@ -4,6 +4,8 @@
 import dbConnect from '../db';
 import User, { type IUser, type IAddress } from '@/models/User';
 import Role from '@/models/Role';
+import Order from '@/models/Order';
+import Review from '@/models/Review';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { cookies } from 'next/headers';
@@ -75,7 +77,7 @@ export async function getUserFromSession(): Promise<IUser | null> {
         const decoded = verify(token, JWT_SECRET) as { userId: string };
         await dbConnect();
         const user = await User.findById(decoded.userId).populate('role').lean();
-        if (!user || user.isGuest) return null; // Do not consider guest users as logged in
+        if (!user || user.isGuest || user.isDeleted) return null; // Do not consider guest or deleted users as logged in
         return JSON.parse(JSON.stringify(user));
     } catch (error) {
         console.error("Invalid token", error);
@@ -217,10 +219,11 @@ export async function loginWithPhone(data: unknown) {
     return JSON.parse(JSON.stringify(userObject));
 }
 
-export async function getUsers(): Promise<IUser[]> {
+export async function getUsers(includeDeleted = false): Promise<IUser[]> {
     await dbConnect();
     await Role.find({});
-    const users = await User.find({}).populate('role').sort({ createdAt: -1 }).lean();
+    const query = includeDeleted ? {} : { isDeleted: { $ne: true } };
+    const users = await User.find(query).populate('role').sort({ createdAt: -1 }).lean();
     return JSON.parse(JSON.stringify(users));
 }
 
@@ -384,4 +387,29 @@ export async function resetPassword(token: string, newPassword: string): Promise
     user.passwordResetExpires = undefined;
     await user.save();
     await createSession(user._id);
+}
+
+
+export async function deleteUser(userId: string) {
+    await dbConnect();
+    await User.findByIdAndUpdate(userId, { isDeleted: true });
+    revalidatePath('/admin/customers');
+}
+
+export async function recoverUser(userId: string) {
+    await dbConnect();
+    await User.findByIdAndUpdate(userId, { isDeleted: false });
+    revalidatePath('/admin/customers');
+}
+
+export async function deleteUserPermanently(userId: string) {
+    await dbConnect();
+    // Cascade delete related data
+    await Order.deleteMany({ user: userId });
+    await Review.deleteMany({ user: userId });
+
+    // Finally delete the user
+    await User.findByIdAndDelete(userId);
+
+    revalidatePath('/admin/customers');
 }

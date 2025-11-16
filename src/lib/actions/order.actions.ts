@@ -10,6 +10,7 @@ import Razorpay from 'razorpay';
 import shortid from 'shortid';
 import crypto from 'crypto';
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
@@ -40,7 +41,8 @@ interface CreateOrderPayload {
 
 export async function createOrder(payload: CreateOrderPayload) {
     await dbConnect();
-    let user = await getUserFromSession();
+    const token = cookies().get('session_token')?.value;
+    let user = await getUserFromSession(token);
 
     const { shippingAddress, saveAddress } = payload;
     
@@ -183,7 +185,8 @@ export async function getOrders(): Promise<IOrder[]> {
 
 export async function getOrdersForUser(): Promise<IOrder[]> {
     await dbConnect();
-    const user = await getUserFromSession();
+    const token = cookies().get('session_token')?.value;
+    const user = await getUserFromSession(token);
     if (!user) {
         return [];
     }

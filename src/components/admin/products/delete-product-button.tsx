@@ -12,17 +12,19 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { deleteRole, recoverRole, deleteRolePermanently } from '@/lib/actions/role.actions';
+import { buttonVariants } from '@/components/ui/button';
+import { archiveProduct, deleteProductPermanently, recoverProduct } from '@/lib/actions/product.actions';
+import { cn } from '@/lib/utils';
 import { Archive, ArchiveRestore, Trash2 } from 'lucide-react';
-import type { IRole } from '@/models/Role';
+import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
-interface DeleteRoleButtonProps {
-  role: IRole;
+interface ProductActionButtonsProps {
+  product: { _id: string; isActive: boolean };
 }
 
-export default function DeleteRoleButton({ role }: DeleteRoleButtonProps) {
+export default function ProductActionButtons({ product }: ProductActionButtonsProps) {
   const { toast } = useToast();
 
   const handleAction = async (action: () => Promise<void>, successMessage: string) => {
@@ -30,39 +32,40 @@ export default function DeleteRoleButton({ role }: DeleteRoleButtonProps) {
       await action();
       toast({ title: successMessage });
     } catch (error) {
-      toast({ variant: 'destructive', title: 'Error', description: 'An error occurred.' });
+      toast({ variant: 'destructive', title: 'Error', description: 'An error occurred while performing the action.' });
     }
   };
 
   return (
     <>
-      {role.isDeleted ? (
-        <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleAction(() => recoverRole(role._id), 'Role recovered')}}>
-          <ArchiveRestore className="mr-2 h-4 w-4" />
-          Recover
-        </DropdownMenuItem>
-      ) : (
-        <AlertDialog>
+      {product.isActive ? (
+         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive hover:!text-destructive">
-              <Archive className="mr-2 h-4 w-4" /> Delete
-            </DropdownMenuItem>
+             <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive hover:!text-destructive">
+                <Archive className="mr-2 h-4 w-4" />
+                Archive
+             </DropdownMenuItem>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This will soft delete the role, hiding it from active lists. It can be recovered later.
+                This will archive the product, hiding it from the storefront.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => handleAction(() => deleteRole(role._id), 'Role deleted')} className="bg-destructive hover:bg-destructive/90">
+              <AlertDialogAction onClick={() => handleAction(() => archiveProduct(product._id), 'Product archived')} className="bg-destructive hover:bg-destructive/90">
                 Continue
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+      ) : (
+         <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleAction(() => recoverProduct(product._id), 'Product recovered')}}>
+          <ArchiveRestore className="mr-2 h-4 w-4" />
+          Recover
+        </DropdownMenuItem>
       )}
 
       <AlertDialog>
@@ -79,12 +82,12 @@ export default function DeleteRoleButton({ role }: DeleteRoleButtonProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the role. Users assigned to this role will lose their admin permissions.
+              This action cannot be undone. This will permanently delete the product from the database.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => handleAction(() => deleteRolePermanently(role._id), 'Role deleted permanently')} className="bg-destructive hover:bg-destructive/90">
+            <AlertDialogAction onClick={() => handleAction(() => deleteProductPermanently(product._id), 'Product deleted permanently')} className={buttonVariants({ variant: 'destructive' })}>
               Continue
             </AlertDialogAction>
           </AlertDialogFooter>

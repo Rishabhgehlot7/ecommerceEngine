@@ -12,11 +12,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
 import { deleteCategory, recoverCategory, deleteCategoryPermanently } from '@/lib/actions/category.actions';
-import { cn } from '@/lib/utils';
 import { Archive, ArchiveRestore, Trash2 } from 'lucide-react';
-import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 import type { ICategory } from '@/models/Category';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
@@ -46,10 +43,27 @@ export default function DeleteCategoryButton({ category }: DeleteCategoryButtonP
           Recover
         </DropdownMenuItem>
       ) : (
-        <DropdownMenuItem onSelect={(e) => {e.preventDefault(); handleAction(() => deleteCategory(category._id), 'Category deleted')}}>
-          <Archive className="mr-2 h-4 w-4" />
-          Delete
-        </DropdownMenuItem>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive hover:!text-destructive">
+              <Archive className="mr-2 h-4 w-4" /> Delete
+            </DropdownMenuItem>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will soft delete the category. It can be recovered later.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => handleAction(() => deleteCategory(category._id), 'Category deleted')} className="bg-destructive hover:bg-destructive/90">
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
 
       <AlertDialog>

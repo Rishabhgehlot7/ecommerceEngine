@@ -25,8 +25,6 @@ export interface IUser extends Document {
   isGuest?: boolean;
   passwordResetToken?: string;
   passwordResetExpires?: Date;
-  phoneOtp?: string;
-  phoneOtpExpires?: Date;
   addresses: IAddress[];
   createdAt: Date;
   updatedAt: Date;
@@ -53,8 +51,6 @@ const UserSchema: Schema = new Schema({
   isGuest: { type: Boolean, default: false },
   passwordResetToken: { type: String, select: false },
   passwordResetExpires: { type: Date, select: false },
-  phoneOtp: { type: String, select: false },
-  phoneOtpExpires: { type: Date, select: false },
   addresses: [AddressSchema],
 }, { timestamps: true });
 

@@ -10,7 +10,14 @@ import {
   useEffect,
 } from 'react';
 import { useRouter } from 'next/navigation';
-import { login as loginAction, signup as signupAction, getUserFromSession, clearUserSession, verifyPhoneOtp } from '@/lib/actions/user.actions';
+import { 
+    login as loginAction, 
+    signup as signupAction, 
+    getUserFromSession, 
+    clearUserSession, 
+    signupWithPhone as signupWithPhoneAction,
+    loginWithPhone as loginWithPhoneAction
+} from '@/lib/actions/user.actions';
 import type { IUser } from '@/models/User';
 
 // A simplified user object for the client-side context
@@ -31,7 +38,8 @@ export interface AuthContextType {
     email: string,
     password: string
   ) => Promise<void>;
-  phoneLogin: (phone: string, otp: string) => Promise<void>;
+  signupWithPhone: (data: {firstName: string, lastName: string, phone: string, password: string}) => Promise<void>;
+  loginWithPhone: (data: {phone: string, password: string}) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -82,9 +90,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     [refreshUser]
   );
-
-  const phoneLogin = useCallback(async (phone: string, otp: string) => {
-      await verifyPhoneOtp(phone, otp);
+  
+  const signupWithPhone = useCallback(async (data: {firstName: string, lastName: string, phone: string, password: string}) => {
+    await signupWithPhoneAction(data);
+    await refreshUser();
+  }, [refreshUser]);
+  
+  const loginWithPhone = useCallback(async (data: {phone: string, password: string}) => {
+      await loginWithPhoneAction(data);
       await refreshUser();
   }, [refreshUser]);
 
@@ -100,7 +113,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isUserLoading,
     login,
     signup,
-    phoneLogin,
+    signupWithPhone,
+    loginWithPhone,
     logout,
     refreshUser,
   };

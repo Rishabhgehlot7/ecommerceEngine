@@ -58,28 +58,46 @@ function CouponActions({ coupon }: { coupon: ICoupon }) {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {coupon.isDeleted ? (
-          <DropdownMenuItem onClick={() => handleAction(() => recoverCoupon(coupon._id), "Coupon recovered")}>
+          <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleAction(() => recoverCoupon(coupon._id), "Coupon recovered")}}>
             <ArchiveRestore className="mr-2 h-4 w-4" />
             Recover
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem onClick={() => handleAction(() => deleteCoupon(coupon._id), "Coupon deleted")}>
-            <Archive className="mr-2 h-4 w-4" />
-            Delete
-          </DropdownMenuItem>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive hover:!text-destructive">
+                <Archive className="mr-2 h-4 w-4" /> Delete
+              </DropdownMenuItem>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will soft delete the coupon, hiding it from active lists. It can be recovered later.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleAction(() => deleteCoupon(coupon._id), "Coupon deleted")} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <button className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 w-full text-destructive hover:text-destructive">
+            <DropdownMenuItem
+              className="text-destructive hover:!text-destructive"
+              onSelect={(e) => e.preventDefault()}
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete Permanently
-            </button>
+            </DropdownMenuItem>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This will permanently delete the coupon.
+                This will permanently delete the coupon. This action cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

@@ -12,9 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
 import { deleteRole, recoverRole, deleteRolePermanently } from '@/lib/actions/role.actions';
-import { cn } from '@/lib/utils';
 import { Archive, ArchiveRestore, Trash2 } from 'lucide-react';
 import type { IRole } from '@/models/Role';
 import { useToast } from '@/hooks/use-toast';
@@ -44,10 +42,27 @@ export default function DeleteRoleButton({ role }: DeleteRoleButtonProps) {
           Recover
         </DropdownMenuItem>
       ) : (
-        <DropdownMenuItem onSelect={(e) => {e.preventDefault(); handleAction(() => deleteRole(role._id), 'Role deleted')}}>
-          <Archive className="mr-2 h-4 w-4" />
-          Delete
-        </DropdownMenuItem>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive hover:!text-destructive">
+              <Archive className="mr-2 h-4 w-4" /> Delete
+            </DropdownMenuItem>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will soft delete the role, hiding it from active lists. It can be recovered later.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => handleAction(() => deleteRole(role._id), 'Role deleted')} className="bg-destructive hover:bg-destructive/90">
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
 
       <AlertDialog>

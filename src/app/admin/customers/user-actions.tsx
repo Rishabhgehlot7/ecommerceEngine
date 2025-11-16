@@ -65,9 +65,30 @@ export default function UserActions({ user }: { user: IUser }) {
             <ArchiveRestore className="mr-2 h-4 w-4" /> Recover
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem onSelect={(e) => { e.preventDefault(); handleAction(() => deleteUser(user._id), 'User deleted'); }}>
-            <Archive className="mr-2 h-4 w-4" /> Delete
-          </DropdownMenuItem>
+           <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <DropdownMenuItem
+                className="text-destructive hover:!text-destructive"
+                onSelect={(e) => e.preventDefault()}
+              >
+                <Archive className="mr-2 h-4 w-4" /> Delete
+              </DropdownMenuItem>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will soft delete the user, hiding them from active lists. They can be recovered later.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleAction(() => deleteUser(user._id), 'User deleted')} className="bg-destructive hover:bg-destructive/90">
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
         <AlertDialog>
           <AlertDialogTrigger asChild>

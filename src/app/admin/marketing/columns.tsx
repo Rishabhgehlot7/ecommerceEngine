@@ -60,28 +60,43 @@ function BannerActions({ banner }: { banner: IBanner }) {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {banner.isDeleted ? (
-          <DropdownMenuItem onClick={() => handleAction(() => recoverBanner(banner._id), 'Banner recovered')}>
+          <DropdownMenuItem onSelect={(e) => {e.preventDefault(); handleAction(() => recoverBanner(banner._id), 'Banner recovered')}}>
             <ArchiveRestore className="mr-2 h-4 w-4" />
             Recover
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem onClick={() => handleAction(() => deleteBanner(banner._id), 'Banner deleted')}>
-            <Archive className="mr-2 h-4 w-4" />
-            Delete
-          </DropdownMenuItem>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive hover:!text-destructive">
+                <Archive className="mr-2 h-4 w-4" /> Delete
+              </DropdownMenuItem>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will soft delete the banner, hiding it from the storefront. It can be recovered later.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleAction(() => deleteBanner(banner._id), 'Banner deleted')} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <button className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 w-full text-destructive hover:text-destructive">
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive hover:!text-destructive">
               <Trash2 className="mr-2 h-4 w-4" />
               Delete Permanently
-            </button>
+            </DropdownMenuItem>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This will permanently delete the banner.
+                This will permanently delete the banner. This action cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

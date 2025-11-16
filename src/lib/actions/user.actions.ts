@@ -24,8 +24,21 @@ const signupSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters long'),
 });
 
+const signupWithPhoneSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  phone: z.string(),
+  password: z.string().min(6, 'Password must be at least 6 characters long'),
+});
+
+
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
+  password: z.string(),
+});
+
+const loginWithPhoneSchema = z.object({
+  phone: z.string(),
   password: z.string(),
 });
 
@@ -121,6 +134,37 @@ export async function signup(data: unknown) {
   return JSON.parse(JSON.stringify(userObject));
 }
 
+export async function signupWithPhone(data: unknown) {
+    const result = signupWithPhoneSchema.safeParse(data);
+    if (!result.success) {
+        throw new Error(result.error.errors.map(e => e.message).join(', '));
+    }
+    const { firstName, lastName, phone, password } = result.data;
+
+    await dbConnect();
+
+    const existingUser = await User.findOne({ phone });
+    if (existingUser) {
+        throw new Error('User with this phone number already exists.');
+    }
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+        firstName,
+        lastName,
+        phone,
+        password: hashedPassword,
+    });
+    
+    await newUser.save();
+    await createSession(newUser._id);
+
+    const userObject = newUser.toObject();
+    delete userObject.password;
+    return JSON.parse(JSON.stringify(userObject));
+}
+
 export async function login(data: unknown) {
     const result = loginSchema.safeParse(data);
     if (!result.success) {
@@ -147,67 +191,29 @@ export async function login(data: unknown) {
     return JSON.parse(JSON.stringify(userObject));
 }
 
-export async function sendPhoneOtp(phone: string) {
+export async function loginWithPhone(data: unknown) {
+    const result = loginWithPhoneSchema.safeParse(data);
+    if (!result.success) {
+        throw new Error(result.error.errors.map(e => e.message).join(', '));
+    }
+    const { phone, password } = result.data;
+
     await dbConnect();
 
-    // Generate a 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-    let user = await User.findOne({ phone });
-    if (!user) {
-        // If user doesn't exist, create a guest user
-        user = new User({
-            phone,
-            firstName: 'Guest',
-            lastName: 'User',
-            isGuest: true,
-        });
+    const user = await User.findOne({ phone, isGuest: { $ne: true } }).select('+password');
+    if (!user || !user.password) {
+        throw new Error('Invalid phone number or password.');
     }
 
-    user.phoneOtp = await bcrypt.hash(otp, 10);
-    user.phoneOtpExpires = expires;
-    await user.save();
-    
-    // --- OTP Sending Simulation ---
-    // In a real application, you would send the OTP via an SMS service here.
-    // For this demo, we'll log it to the console.
-    console.log(`--- PHONE OTP ---`);
-    console.log(`OTP for ${phone}: ${otp}`);
-    console.log('-----------------');
-}
-
-export async function verifyPhoneOtp(phone: string, otp: string) {
-    await dbConnect();
-
-    const user = await User.findOne({ phone, phoneOtpExpires: { $gt: Date.now() } }).select('+phoneOtp');
-    if (!user || !user.phoneOtp) {
-        throw new Error("Invalid phone number or OTP has expired.");
-    }
-    
-    const isOtpValid = await bcrypt.compare(otp, user.phoneOtp);
-    if (!isOtpValid) {
-        throw new Error("Invalid OTP.");
-    }
-    
-    // OTP is valid, clear it and log the user in
-    user.phoneOtp = undefined;
-    user.phoneOtpExpires = undefined;
-
-    // If the user was a guest, they are now a partially verified user.
-    if(user.isGuest) {
-        user.isGuest = false;
-        user.firstName = 'User';
-        user.lastName = '';
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+        throw new Error('Invalid phone number or password.');
     }
 
-    await user.save();
     await createSession(user._id);
 
-    revalidatePath('/profile');
-
     const userObject = user.toObject();
-    delete userObject.phoneOtp;
+    delete userObject.password;
     return JSON.parse(JSON.stringify(userObject));
 }
 

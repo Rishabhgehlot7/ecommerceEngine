@@ -23,13 +23,19 @@ import { getOrders } from '@/lib/actions/order.actions';
 import type { IOrder } from '@/models/Order';
 import type { IUser } from '@/models/User';
 import Link from 'next/link';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 export default async function AdminDashboardPage() {
   const [products, users, orders, adminUser] = await Promise.all([
     getProducts(),
     getUsers(),
     getOrders(),
-    getUserFromSession()
+    getUserFromSession(),
   ]);
 
   const successfulOrders = orders.filter(o => o.status !== 'Pending' && o.status !== 'Failed');
@@ -64,6 +70,24 @@ export default async function AdminDashboardPage() {
   ];
 
   const recentSales: IOrder[] = orders.slice(0, 5);
+
+  const salesByMonth = successfulOrders.reduce((acc, order) => {
+    const month = new Date(order.createdAt).toLocaleString('default', { month: 'short' });
+    acc[month] = (acc[month] || 0) + order.totalAmount;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const chartData = Object.entries(salesByMonth).map(([month, total]) => ({
+    month,
+    revenue: total,
+  }));
+
+  const chartConfig = {
+    revenue: {
+      label: 'Revenue',
+      color: 'hsl(var(--chart-1))',
+    },
+  };
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -112,68 +136,95 @@ export default async function AdminDashboardPage() {
           </Card>
         ))}
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Sales</CardTitle>
-          <CardDescription>
-            Your 5 most recent sales.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Customer</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentSales.length > 0 ? (
-                recentSales.map((sale) => {
-                  const user = sale.user as IUser;
-                  return (
-                    <TableRow key={sale._id}>
-                      <TableCell>
-                        <Link href={`/admin/orders/${sale._id}`} className="flex items-center gap-3">
-                           <Avatar className="h-9 w-9">
-                              <AvatarImage src={user.avatar} alt={`${user.firstName} ${user.lastName}`} />
-                              <AvatarFallback>{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</AvatarFallback>
-                           </Avatar>
-                           <div>
-                              <div className="font-medium hover:underline">{user.firstName} {user.lastName}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {user.email}
-                              </div>
-                           </div>
-                        </Link>
-                      </TableCell>
-                       <TableCell>
-                        <Badge
-                          variant={getStatusVariant(sale.status)}
-                        >
-                          {sale.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(sale.createdAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right">{formatPrice(sale.totalAmount)}</TableCell>
-                    </TableRow>
-                  )
-                })
-              ) : (
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card>
+            <CardHeader>
+                <CardTitle>Sales Overview</CardTitle>
+                <CardDescription>Your monthly sales revenue.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                <BarChart data={chartData}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    tickMargin={10}
+                    axisLine={false}
+                    />
+                    <YAxis />
+                    <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent indicator="line" />}
+                    />
+                    <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} />
+                </BarChart>
+                </ChartContainer>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader>
+            <CardTitle>Recent Sales</CardTitle>
+            <CardDescription>
+                Your 5 most recent sales.
+            </CardDescription>
+            </CardHeader>
+            <CardContent>
+            <Table>
+                <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center">
-                    No recent sales.
-                  </TableCell>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                {recentSales.length > 0 ? (
+                    recentSales.map((sale) => {
+                    const user = sale.user as IUser;
+                    return (
+                        <TableRow key={sale._id}>
+                        <TableCell>
+                            <Link href={`/admin/orders/${sale._id}`} className="flex items-center gap-3">
+                            <Avatar className="h-9 w-9">
+                                <AvatarImage src={user.avatar} alt={`${user.firstName} ${user.lastName}`} />
+                                <AvatarFallback>{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <div className="font-medium hover:underline">{user.firstName} {user.lastName}</div>
+                                <div className="text-sm text-muted-foreground">
+                                    {user.email}
+                                </div>
+                            </div>
+                            </Link>
+                        </TableCell>
+                        <TableCell>
+                            <Badge
+                            variant={getStatusVariant(sale.status)}
+                            >
+                            {sale.status}
+                            </Badge>
+                        </TableCell>
+                        <TableCell>
+                            {new Date(sale.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-right">{formatPrice(sale.totalAmount)}</TableCell>
+                        </TableRow>
+                    )
+                    })
+                ) : (
+                    <TableRow>
+                    <TableCell colSpan={4} className="h-24 text-center">
+                        No recent sales.
+                    </TableCell>
+                    </TableRow>
+                )}
+                </TableBody>
+            </Table>
+            </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

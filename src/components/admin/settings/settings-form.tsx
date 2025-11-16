@@ -37,6 +37,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { isValidPhoneNumber } from 'libphonenumber-js';
+import { cn } from '@/lib/utils';
 
 
 const phoneSchema = z.string().refine((value) => {
@@ -57,6 +58,15 @@ const storeFormSchema = z.object({
   'socials.twitter': z.string().url().or(z.literal('')),
   'socials.youtube': z.string().url().or(z.literal('')),
 });
+
+const predefinedThemes = [
+  { name: 'Default Blue', color: '#2563eb' },
+  { name: 'Emerald', color: '#059669' },
+  { name: 'Amber', color: '#d97706' },
+  { name: 'Slate', color: '#475569' },
+  { name: 'Rose', color: '#e11d48' },
+  { name: 'Violet', color: '#7c3aed' },
+];
 
 export default function SettingsForm({ settings }: { settings: ISettings }) {
   const { toast } = useToast();
@@ -280,6 +290,24 @@ export default function SettingsForm({ settings }: { settings: ISettings }) {
                             onChange={(e) => setPrimaryColor(e.target.value)} 
                             className="max-w-xs" 
                           />
+                      </div>
+                       <div className="mt-4">
+                        <Label className="text-sm text-muted-foreground">Predefined Themes</Label>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {predefinedThemes.map((theme) => (
+                            <button
+                              key={theme.name}
+                              type="button"
+                              className={cn(
+                                'h-8 w-8 rounded-full border-2 transition-transform hover:scale-110',
+                                primaryColor === theme.color ? 'border-ring' : 'border-transparent'
+                              )}
+                              style={{ backgroundColor: theme.color }}
+                              title={theme.name}
+                              onClick={() => setPrimaryColor(theme.color)}
+                            />
+                          ))}
+                        </div>
                       </div>
                     </div>
                     <div>

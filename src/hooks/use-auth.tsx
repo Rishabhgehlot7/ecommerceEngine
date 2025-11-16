@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import {
@@ -19,7 +20,6 @@ import {
     loginWithPhone as loginWithPhoneAction
 } from '@/lib/actions/user.actions';
 import type { IUser } from '@/models/User';
-import { cookies } from 'next/dist/client/components/hooks-server-context';
 
 // A simplified user object for the client-side context
 export type ClientUser = Omit<IUser, 'password' | 'addresses'> & {
@@ -47,17 +47,14 @@ export interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-async function getSessionUser() {
-  // This is a client component, so we can't use server-side `cookies()` directly.
-  // The server action `getUserFromSession` is the correct way to handle this,
-  // but it needs to be called in an async context.
-  try {
-    const sessionUser = await getUserFromSession(document.cookie.split('; ').find(row => row.startsWith('session_token='))?.split('=')[1]);
-    return sessionUser;
-  } catch (error) {
-    return null;
+function getCookie(name: string): string | undefined {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+      return parts.pop()?.split(';').shift();
   }
 }
+
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -66,7 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   
   const refreshUser = useCallback(async () => {
      setIsUserLoading(true);
-      const sessionUser = await getSessionUser();
+      const token = getCookie('session_token');
+      const sessionUser = await getUserFromSession(token);
       if (sessionUser) {
            const clientUser: ClientUser = {
               ...JSON.parse(JSON.stringify(sessionUser)),

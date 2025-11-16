@@ -71,6 +71,12 @@ async function createSession(userId: string) {
 }
 
 export async function getUserFromSession(token?: string): Promise<IUser | null> {
+    if (!token) {
+        // Fallback to reading from cookies if no token is passed (for server-side rendering)
+        const cookieStore = cookies();
+        token = cookieStore.get(COOKIE_NAME)?.value;
+    }
+    
     if (!token) return null;
 
     try {

@@ -13,7 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, PieChart, Pie, Cell } from 'recharts';
 import { useMemo } from 'react';
 import { DollarSign, Package, Users, ShoppingCart } from 'lucide-react';
 import { getProducts } from '@/lib/actions/product.actions';
@@ -25,16 +25,18 @@ import type { IOrder, IOrderItem } from '@/models/Order';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const chartConfig = {
-  products: {
-    label: 'Products',
-    color: 'hsl(var(--chart-2))',
-  },
+const chartConfigBar = {
   sales: {
     label: 'Sales',
     color: 'hsl(var(--chart-1))',
   }
 };
+
+const chartConfigPie = {
+  products: {
+    label: 'Products',
+  },
+} as const;
 
 export default function AnalyticsPage() {
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -69,7 +71,7 @@ export default function AnalyticsPage() {
     const totalCustomers = users.length;
 
     const productSales = successfulOrders.reduce((acc, order) => {
-        order.items.forEach((item: any) => { // Use any to access populated product
+        order.items.forEach((item: any) => {
             const productId = item.product?._id?.toString();
             if (productId && item.product?.name) {
                  if (!acc[productId]) {
@@ -89,7 +91,11 @@ export default function AnalyticsPage() {
         return acc;
     }, {} as Record<string, number>);
 
-    const productsPerCategory = Object.entries(categoryCount).map(([name, count]) => ({name, products: count}));
+    const productsPerCategory = Object.entries(categoryCount).map(([name, products], index) => ({
+      name, 
+      products, 
+      fill: `hsl(var(--chart-${index + 1}))`
+    }));
 
 
     return {
@@ -128,8 +134,25 @@ export default function AnalyticsPage() {
                 {[...Array(4)].map((_, i) => <Card key={i}><CardHeader><Skeleton className="h-4 w-2/3" /></CardHeader><CardContent><Skeleton className="h-8 w-1/2"/></CardContent></Card>)}
             </div>
              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                 <Card><CardHeader><Skeleton className="h-6 w-1/2"/></CardHeader><CardContent><Skeleton className="h-[250px] w-full" /></CardContent></Card>
-                 <Card><CardHeader><Skeleton className="h-6 w-1/2"/></CardHeader><CardContent><Skeleton className="h-[250px] w-full" /></CardContent></Card>
+                 <Card>
+                    <CardHeader className="items-center pb-0">
+                        <CardTitle>Products per Category</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-1 pb-0">
+                         <div className="mx-auto flex aspect-square h-full w-full max-w-[250px] items-center justify-center">
+                            <Skeleton className="h-full w-full rounded-full" />
+                         </div>
+                    </CardContent>
+                 </Card>
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>Top Selling Products</CardTitle>
+                        <CardDescription>Your best performing products by units sold.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Skeleton className="h-[250px] w-full" />
+                    </CardContent>
+                </Card>
             </div>
           </div>
       )
@@ -161,22 +184,28 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
+        <Card className="flex flex-col">
+          <CardHeader className="items-center pb-0">
             <CardTitle>Products per Category</CardTitle>
-            <CardDescription>A count of products in each top-level category.</CardDescription>
+            <CardDescription>A breakdown of products across categories.</CardDescription>
           </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig} className="h-[250px] w-full">
-                <BarChart data={productsPerCategory} layout="vertical" margin={{ left: 20, right: 0, top: 5, bottom: 5, }}>
-                    <CartesianGrid horizontal={false} />
-                    <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={8} width={120} />
-                    <XAxis type="number" dataKey="products"/>
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="products" fill="var(--color-products)" radius={4} />
-                </BarChart>
+          <CardContent className="flex-1 pb-0">
+            <ChartContainer config={chartConfigPie} className="mx-auto aspect-square max-h-[250px]">
+              <PieChart>
+                <ChartTooltip content={<ChartTooltipContent nameKey="products" hideLabel />} />
+                <Pie data={productsPerCategory} dataKey="products" nameKey="name" innerRadius={60}>
+                  {productsPerCategory.map((entry) => (
+                    <Cell key={`cell-${entry.name}`} fill={entry.fill} />
+                  ))}
+                </Pie>
+              </PieChart>
             </ChartContainer>
           </CardContent>
+           <CardFooter className="flex-col gap-2 text-sm pt-4">
+            <div className="flex items-center gap-2 font-medium leading-none">
+              Showing distribution for {products.length} products.
+            </div>
+          </CardFooter>
         </Card>
         <Card>
           <CardHeader>
@@ -185,12 +214,12 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
              {topSellingProducts.length > 0 ? (
-                <ChartContainer config={chartConfig} className="h-[250px] w-full">
+                <ChartContainer config={chartConfigBar} className="h-[250px] w-full">
                     <BarChart data={topSellingProducts} layout="vertical" margin={{ left: 20, right: 0, top: 5, bottom: 5}}>
                         <CartesianGrid horizontal={false} />
                         <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} tickMargin={8} width={120} />
                         <XAxis type="number" dataKey="sales"/>
-                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="line" />} />
                         <Bar dataKey="sales" fill="var(--color-sales)" radius={4} />
                     </BarChart>
                 </ChartContainer>

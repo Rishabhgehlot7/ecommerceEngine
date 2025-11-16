@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -14,21 +15,24 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DollarSign, Package, ShoppingCart, Users } from 'lucide-react';
 import { getProducts } from '@/lib/actions/product.actions';
-import { getUsers } from '@/lib/actions/user.actions';
+import { getUsers, getUserFromSession } from '@/lib/actions/user.actions';
 import { getOrders } from '@/lib/actions/order.actions';
 import type { IOrder } from '@/models/Order';
 import type { IUser } from '@/models/User';
 import Link from 'next/link';
 
 export default async function AdminDashboardPage() {
-  const products = await getProducts();
-  const users = await getUsers();
-  const orders = await getOrders();
+  const [products, users, orders, adminUser] = await Promise.all([
+    getProducts(),
+    getUsers(),
+    getOrders(),
+    getUserFromSession()
+  ]);
 
   const successfulOrders = orders.filter(o => o.status !== 'Pending' && o.status !== 'Failed');
-
   const totalRevenue = successfulOrders.reduce((sum, order) => sum + order.totalAmount, 0);
   const totalSales = successfulOrders.length;
   
@@ -86,6 +90,12 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="space-y-6">
+       <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Welcome back, {adminUser?.firstName || 'Admin'}!</h2>
+          <p className="text-muted-foreground">Here's a summary of your store's performance.</p>
+        </div>
+      </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <Card key={stat.title}>
@@ -121,29 +131,38 @@ export default async function AdminDashboardPage() {
             </TableHeader>
             <TableBody>
               {recentSales.length > 0 ? (
-                recentSales.map((sale) => (
-                  <TableRow key={sale._id}>
-                    <TableCell>
-                      <Link href={`/admin/orders/${sale._id}`}>
-                        <div className="font-medium hover:underline">{(sale.user as IUser).firstName} {(sale.user as IUser).lastName}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {(sale.user as IUser).email}
-                        </div>
-                      </Link>
-                    </TableCell>
-                     <TableCell>
-                      <Badge
-                        variant={getStatusVariant(sale.status)}
-                      >
-                        {sale.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(sale.createdAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="text-right">{formatPrice(sale.totalAmount)}</TableCell>
-                  </TableRow>
-                ))
+                recentSales.map((sale) => {
+                  const user = sale.user as IUser;
+                  return (
+                    <TableRow key={sale._id}>
+                      <TableCell>
+                        <Link href={`/admin/orders/${sale._id}`} className="flex items-center gap-3">
+                           <Avatar className="h-9 w-9">
+                              <AvatarImage src={user.avatar} alt={`${user.firstName} ${user.lastName}`} />
+                              <AvatarFallback>{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</AvatarFallback>
+                           </Avatar>
+                           <div>
+                              <div className="font-medium hover:underline">{user.firstName} {user.lastName}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {user.email}
+                              </div>
+                           </div>
+                        </Link>
+                      </TableCell>
+                       <TableCell>
+                        <Badge
+                          variant={getStatusVariant(sale.status)}
+                        >
+                          {sale.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(sale.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-right">{formatPrice(sale.totalAmount)}</TableCell>
+                    </TableRow>
+                  )
+                })
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="h-24 text-center">

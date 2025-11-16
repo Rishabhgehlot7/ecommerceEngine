@@ -11,22 +11,28 @@ export default function ThemeInjector() {
   useEffect(() => {
     if (!settings.primaryColor || !settings.primaryColorDark) return;
 
-    const primaryColorLightHsl = hexToHsl(settings.primaryColor);
-    const primaryColorDarkHsl = hexToHsl(settings.primaryColorDark);
+    const { hsl: primaryColorLightHsl, luminance: lightLuminance } = hexToHsl(settings.primaryColor);
+    const { hsl: primaryColorDarkHsl, luminance: darkLuminance } = hexToHsl(settings.primaryColorDark);
 
     const fontBody = settings.font === 'poppins' ? "'Poppins', sans-serif" : "'Inter', sans-serif";
     const fontHeadline = settings.font === 'poppins' ? "'Poppins', sans-serif" : "'Poppins', sans-serif";
+    
+    // Determine foreground color based on luminance
+    const lightForegroundHsl = lightLuminance > 0.5 ? '222 47% 11%' : '210 40% 98%';
+    const darkForegroundHsl = darkLuminance > 0.5 ? '222 47% 11%' : '210 40% 98%';
 
     const style = document.createElement('style');
     style.id = 'theme-variables';
     style.innerHTML = `
       :root { 
         --primary-hsl: ${primaryColorLightHsl};
+        --primary-foreground-hsl: ${lightForegroundHsl};
         --font-body: ${fontBody};
         --font-headline: ${fontHeadline};
       }
       .dark {
         --primary-dark-hsl: ${primaryColorDarkHsl};
+        --primary-foreground-hsl: ${darkForegroundHsl};
       }
     `;
 

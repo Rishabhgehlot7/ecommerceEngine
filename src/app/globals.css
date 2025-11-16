@@ -14,19 +14,18 @@
 
     /* HSL values set by ThemeInjector, with fallbacks */
     --primary-hsl: 221 83% 53%; 
+    --primary-foreground-hsl: 210 40% 98%;
     
     --primary: hsl(var(--primary-hsl));
-    --primary-foreground: 210 40% 98%;
+    --primary-foreground: hsl(var(--primary-foreground-hsl));
     
-    /* Secondary is a solid, slightly desaturated version of primary */
-    --secondary-hsl: var(--primary-hsl) / 0.8;
-    --secondary: hsl(var(--primary-hsl) / 1.2);
-    --secondary-foreground: 210 40% 98%;
+    --secondary-hsl: var(--primary-hsl);
+    --secondary: hsl(var(--secondary-hsl) / 1.2);
+    --secondary-foreground: var(--primary-foreground);
     
-    /* Accent is a solid, very light version of primary */
-    --accent-hsl: var(--primary-hsl) / 0.1;
-    --accent: hsl(var(--primary-hsl) / 1.5);
-    --accent-foreground: 222 47% 11%;
+    --accent-hsl: var(--primary-hsl);
+    --accent: hsl(var(--accent-hsl) / 1.5);
+    --accent-foreground: var(--primary-foreground);
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
@@ -54,17 +53,18 @@
     
     /* HSL values set by ThemeInjector, with fallbacks */
     --primary-dark-hsl: 217 91% 60%;
+    --primary-hsl: var(--primary-dark-hsl);
     
-    --primary: hsl(var(--primary-dark-hsl));
-    --primary-foreground: 222 47% 11%;
+    --primary: hsl(var(--primary-hsl));
+    --primary-foreground: hsl(var(--primary-foreground-hsl));
 
-    --secondary-hsl: var(--primary-dark-hsl) / 0.8;
-    --secondary: hsl(var(--primary-dark-hsl) / 1.2);
-    --secondary-foreground: 222 47% 11%;
+    --secondary-hsl: var(--primary-dark-hsl);
+    --secondary: hsl(var(--secondary-hsl) / 1.2);
+    --secondary-foreground: var(--primary-foreground);
 
-    --accent-hsl: var(--primary-dark-hsl) / 0.15;
-    --accent: hsl(var(--primary-dark-hsl) / 1.5);
-    --accent-foreground: 210 40% 98%;
+    --accent-hsl: var(--primary-dark-hsl);
+    --accent: hsl(var(--accent-hsl) / 1.5);
+    --accent-foreground: var(--primary-foreground);
     
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
@@ -87,6 +87,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
   }
   h1,
   h2,

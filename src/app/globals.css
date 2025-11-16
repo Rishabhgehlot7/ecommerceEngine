@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,19 +12,20 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary-light-hsl: 221 83% 53%;
-    --primary-light: hsl(var(--primary-light-hsl));
+    /* HSL values set by ThemeInjector, with fallbacks */
+    --primary-hsl: 221 83% 53%; 
     
-    --primary: var(--primary-light);
+    --primary: hsl(var(--primary-hsl));
     --primary-foreground: 210 40% 98%;
     
-    --secondary: hsl(var(--primary-light-hsl) / 0.8);
+    /* Secondary is a solid, slightly desaturated version of primary */
+    --secondary-hsl: var(--primary-hsl) / 0.8;
+    --secondary: hsl(var(--primary-hsl) / 1.2);
     --secondary-foreground: 210 40% 98%;
     
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 28% 45%;
-    
-    --accent: hsl(var(--primary-light-hsl) / 0.1);
+    /* Accent is a solid, very light version of primary */
+    --accent-hsl: var(--primary-hsl) / 0.1;
+    --accent: hsl(var(--primary-hsl) / 1.5);
     --accent-foreground: 222 47% 11%;
     
     --destructive: 0 84% 60%;
@@ -31,7 +33,7 @@
     
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: var(--primary-light);
+    --ring: hsl(var(--primary-hsl));
     
     --radius: 0.75rem;
     
@@ -50,19 +52,18 @@
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
     
+    /* HSL values set by ThemeInjector, with fallbacks */
     --primary-dark-hsl: 217 91% 60%;
-    --primary-dark: hsl(var(--primary-dark-hsl));
     
-    --primary: var(--primary-dark);
+    --primary: hsl(var(--primary-dark-hsl));
     --primary-foreground: 222 47% 11%;
 
-    --secondary: hsl(var(--primary-dark-hsl) / 0.8);
+    --secondary-hsl: var(--primary-dark-hsl) / 0.8;
+    --secondary: hsl(var(--primary-dark-hsl) / 1.2);
     --secondary-foreground: 222 47% 11%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: hsl(var(--primary-dark-hsl) / 0.15);
+    --accent-hsl: var(--primary-dark-hsl) / 0.15;
+    --accent: hsl(var(--primary-dark-hsl) / 1.5);
     --accent-foreground: 210 40% 98%;
     
     --destructive: 0 63% 31%;
@@ -70,7 +71,7 @@
     
     --border: 217 33% 25%;
     --input: 217 33% 25%;
-    --ring: var(--primary-dark);
+    --ring: hsl(var(--primary-dark-hsl));
 
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;

@@ -21,10 +21,12 @@ export default function ThemeInjector() {
     style.id = 'theme-variables';
     style.innerHTML = `
       :root { 
-        --primary-light: ${primaryColorLightHsl};
-        --primary-dark: ${primaryColorDarkHsl};
+        --primary-hsl: ${primaryColorLightHsl};
         --font-body: ${fontBody};
         --font-headline: ${fontHeadline};
+      }
+      .dark {
+        --primary-dark-hsl: ${primaryColorDarkHsl};
       }
     `;
 
